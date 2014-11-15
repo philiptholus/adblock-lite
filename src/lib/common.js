@@ -28,9 +28,9 @@ if (storage.read("version") != version()) {
 }
 
 // Initialization
+if (!storage.read("allowedURLs")) storage.write("allowedURLs", JSON.stringify(filters.allowedURLs));
 if (!storage.read("fullLite")) storage.write("fullLite", "Full");
 if (!storage.read("startStop")) storage.write("startStop", "Enable");
-if (!storage.read("allowedURLs")) storage.write("allowedURLs", JSON.stringify(filters.allowedURLs));
 
 function setIcon() {
   var startStop = storage.read("startStop")

@@ -316,32 +316,23 @@ iframe[src*="cdn.zeusclicks.com/ads/"]{
   visibility: hidden !important;
 }
 
-
-iframe[src*=src="//inb.genorithm"],
-iframe[src*=src="http://an.z5x.net"],
-iframe[src*=src="http://www.superfish"],
-iframe[src*="//static.re-markable00"],
-iframe[src*=src="http://i.vizejs.info/izer"],
-iframe[src*=src="http://a.visadd.com/script"],
-iframe[src*=src="http://intext.linknavi1"],
-iframe[src*=src="//static.re-markable00"],
-iframe[src*=src="http://i.vizejs.info/izer"],
-iframe[src*=src="http://a.visadd.com/script"],
-iframe[src*=src="http://i.vizejs.info"],
-iframe[src*=src="http://i.vizejs.info"],
-
-
-
+iframe[id*="ad-iframe"],
+iframe[src*="//inb.genorithm."],
+iframe[src*="an.z5x.net"],
+iframe[src*="www.superfish."],
+iframe[src*="static.re-markable00."],
+iframe[src*="intext.linknavi1"],
+iframe[src*="static.re-markable00"],
+iframe[src*="a.visadd.com/script"],
+iframe[src*="i.vizejs.info/"],
 iframe[src*="altare.sitescoutadserver"],
 iframe[src*="ads.trafficjunky.net/ads"],
-iframe[src*="clients5.google.com/pagead"],
 iframe[src*="ads.adsrvmedia.net"],
 iframe[src*="bcp.crwdcntrl.net"],
 iframe[src*="syndication.cntrafficpro"],
 iframe[src*="bdv.bidvertiser.com/bidvertiser"],
 iframe[src*="banners.sexypartners"],
 iframe[name*="BidVertiser_"],
-iframe[id*="ad-iframe"],
 iframe[src*="a.tribalfusion"],
 iframe[src*="/adserve/"]{
   display: none !important;

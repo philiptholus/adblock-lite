@@ -27,21 +27,6 @@ Cu.import("resource://gre/modules/Promise.jsm");
 var filters = filter.filters;
 exports.timer = timers;
 
-var button = buttons.ActionButton({
-  id: "iadblocklite",
-  label: "AdBlock Lite",
-  icon: {
-    "16": "./icon16.png",
-    "32": "./icon32.png",
-    "64": "./icon64.png"
-  },
-  onClick: function (state) {
-    popup.show({
-      position: button
-    });
-  }
-});
-
 /* * Code for injecting content_script * */
 var workers = [], content_script_arr = [];
 function insertContentScript() {
@@ -80,9 +65,10 @@ sp.on("fullLite", reRunPageMode);
 sp.on("startStop", reRunPageMode);
 sp.on("allowedURLs", reRunPageMode);
 
-if (prefs.startStop == "Enable") {
+if (prefs.startStop == "Enable" && prefs.allowedURLs) {
   myPageMode = insertContentScript();
 }
+
 var httpRequestObserver = {
   observe: function(subject, topic, data) {
     if (topic == "http-on-modify-request") {
@@ -146,6 +132,21 @@ popup.on('show', function() {
 });
 popup.port.on("resize", function(obj) {
   popup.resize(obj.w, obj.h + 3);
+});
+
+var button = buttons.ActionButton({
+  id: "iadblocklite",
+  label: "AdBlock Lite",
+  icon: {
+    "16": "./icon16.png",
+    "32": "./icon32.png",
+    "64": "./icon64.png"
+  },
+  onClick: function (state) {
+    popup.show({
+      position: button
+    });
+  }
 });
 
 exports.storage = {

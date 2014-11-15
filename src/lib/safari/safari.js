@@ -5,7 +5,9 @@ var _safari = {
     },
     write: function (id, data) {
       localStorage[id] = data + "";
-      insertContentScript();
+      if (id === "fullLite" || id === "startStop" || id === "allowedURLs") {
+        insertContentScript();
+      }
     }
   },
 
@@ -180,7 +182,6 @@ var _safari = {
 function insertContentScript() {
   safari.extension.removeContentScripts();
   safari.extension.removeContentStyleSheets();
-
   if (localStorage["startStop"] == "Enable") {
     var BL = JSON.parse(localStorage["allowedURLs"]);
     BL.map(function (e) {
@@ -201,7 +202,9 @@ function insertContentScript() {
     safari.extension.addContentStyleSheetFromURL(contentStyle.loc, contentStyle.whitelist, contentStyle.blacklist, false);
   }
 }
-insertContentScript();
+if (localStorage["allowedURLs"]) {
+  insertContentScript();
+}
 
 function handler(event) {
   if (localStorage["startStop"] == "Enable") {
