@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="popup.css"/>
+  </head>
+  <body>
+    <table style="table-layout: fixed">
+      <tbody>
+        <tr>
+          <td id="start-stop-button-td">
+            <div id="start-stop-button" title="Click to Disable or Enable the extension. Please note, the toolbar icon changes color to match your choice  -- (Red Color: Full Mode) -- (Blue Color: Lite Mode) -- (Gray Color: AdBlock is Disabled) --">
+            </div>
+          </td>
+          <td id="full-lite-button-td">
+            <div id="full-lite-button" title="Switch between Full and Lite modes. In Lite mode, the extension uses the least amount of CPU power and Memory and it runs based on pure CSS. Lite mode is ideal for slow machines. In Full mode, more Ads are targeted and more CPU power and Memory are required.">
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table>
+      <tbody>
+        <tr>
+          <td id="input-field-td">
+            <input id="input-field" placeholder="Enter a website to exclude" title="Enter a portion of the desired website to exclude it from blocking. For instance, if you would like to allow advertising on https://mail.google.com, simply enter mail.google.com and press Enter or (+) button.">
+            </input>
+          </td>
+          <td id="input-field-add"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div id="website-list">
+      <table id="website-list-table"></table>
+    </div>
+    <table>
+      <tbody>
+        <tr>
+          <td id="information-td">
+            <span id="information-span"></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <!--
+    <script type="text/javascript" src="popup.js"></script>
+    -->
+  </body>
+</html>

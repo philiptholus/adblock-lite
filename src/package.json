@@ -1,0 +1,12 @@
+{
+  "name": "adblock-lite",
+  "version": "0.1.5",
+  "title": "AdBlock Lite",
+  "id": "jid1-dwtFBkQjb3SIQp",
+  "description": "Block ads seamlessly on popular websites",
+  "license": "MPL 2.0",
+  "main": "common",
+  "permissions": {
+    "private-browsing": true
+  }
+}
