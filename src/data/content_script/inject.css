@@ -179,6 +179,7 @@ div[id*="ad-slot"]{
 }
 
 a[href*="google.com/aclk"],
+a[class*="-list-img-ad"],
 a[href*="adwords.google.com"],
 a[href*="/yahoo/relevantads.html"],
 a[href*="mgid.com"],

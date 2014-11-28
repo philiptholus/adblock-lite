@@ -1,16 +1,27 @@
-var background = {}, manifest = {};
+var background = {}, manifest = {}, fullLite = '', initRun = true;
 
 /**** wrapper (start) ****/
-if (typeof self !== 'undefined' && self.port) { //Firefox
+if (typeof self !== 'undefined' && self.port) { /* Firefox */
   background.send = function (id, data) {
     self.port.emit(id, data);
   }
   background.receive = function (id, callback) {
     self.port.on(id, callback);
   }
+  self.port.on("topLevelUrl", function (url) {
+    fullLite = self.options.fullLite;
+    var allowedURLs = self.options.allowedURLs;
+    for (var i = 0; i < allowedURLs.length; i++) {
+      if (url.indexOf(allowedURLs[i]) != -1) {
+        return;
+      }
+    }
+    injectCSS();
+    init();
+  });
   manifest.url = "resource://" + self.options.manifest.id.replace("@", "-at-") + "/" + self.options.manifest.name + "/";
 }
-else if (typeof safari !== 'undefined') { // Safari
+else if (typeof safari !== 'undefined') { /* Safari */
   background.send = function (id, obj) {
     safari.self.tab.dispatchMessage("message", {
       id: id,
@@ -38,13 +49,15 @@ else if (typeof safari !== 'undefined') { // Safari
     } catch (e) {}
   }, false);
 
-  init(); /* run */
-
-  /* dispatch event for Safari */
+  /* dispatch event for Safari: httpChannel*/
   function isUrlAllowed() {
-    clearAdBlock();
+    /* clearAdBlock(); */
     try {
       var answer = safari.self.tab.canLoad(event, event.url);
+      if ((answer == "init" || answer == "block") && initRun) {
+          injectCSS();
+          init();
+        }
       if (answer == "block") event.preventDefault();
     }
     catch (e) {}
@@ -52,7 +65,7 @@ else if (typeof safari !== 'undefined') { // Safari
   window.addEventListener("beforeload", isUrlAllowed, true);
   // **************************
 }
-else if (typeof chrome !== 'undefined') { // Chrome
+else if (typeof chrome !== 'undefined') { /* Chrome */
   background.send = function (id, data) {
     chrome.extension.sendRequest({method: id, data: data});
   }
@@ -68,9 +81,8 @@ else if (typeof chrome !== 'undefined') { // Chrome
 }
 /**** wrapper (end) ****/
 
-var URL = "", fullLite = "";
 background.receive("fullLite", function (e) {
-  fullLite = e; // for Chrome, Opera and Safari
+  fullLite = e; /* for Chrome, Opera and Safari */
 });
 
 var scriptFilters = [
@@ -236,10 +248,27 @@ function requestClearAdBlock() {
   background.send("clearAdBlock");
 }
 
+function injectCSS() {
+  var id = "adblock-lite-list";
+  var css = document.getElementById(id);
+  if (!css) {
+    var link = document.createElement("link");
+    link.setAttribute("id", id);
+    link.rel = "stylesheet";
+    link.type = "text/css";
+    link.href = manifest.url + "data/content_script/inject.css";
+    var head = document.querySelector("head") || document.head || document.documentElement;
+    if (head) head.appendChild(link);
+  }
+}
+
 function init() {
+  initRun = false;
   window.addEventListener("load", requestClearAdBlock, false);
   window.addEventListener("DOMContentLoaded", requestClearAdBlock, false);
-  background.receive("clearAdBlock", clearAdBlock);
+  /* Not active for now: due to adding lag to the browser
+     background.receive("clearAdBlock", clearAdBlock);
+  */
   background.receive("adblock-list", function (data) {
     if (fullLite == "Lite") return;
     var id = "adblock-full-list";
@@ -270,28 +299,4 @@ function init() {
     }
   });
   */
-}
-
-if (background.receive) { /* for Firefox */
-  background.receive("topLevelUrl", function (url) {
-    fullLite = self.options.fullLite;
-    var allowedURLs = self.options.allowedURLs;
-    for (var i = 0; i < allowedURLs.length; i++) {
-      if (url.indexOf(allowedURLs[i]) != -1) {
-        return;
-      }
-    }
-    var id = "adblock-lite-list";
-    var css = document.getElementById(id);
-    if (!css) {
-      var link = document.createElement("link");
-      link.setAttribute("id", id);
-      link.rel = "stylesheet";
-      link.type = "text/css";
-      link.href = manifest.url + "data/content_script/inject.css";
-      var head = document.querySelector("head") || document.head || document.documentElement;
-      if (head) head.appendChild(link);
-    }
-    init();
-  });
 }

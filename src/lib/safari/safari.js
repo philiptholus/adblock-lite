@@ -183,23 +183,10 @@ function insertContentScript() {
   safari.extension.removeContentScripts();
   safari.extension.removeContentStyleSheets();
   if (localStorage["startStop"] == "Enable") {
-    var BL = JSON.parse(localStorage["allowedURLs"]);
-    BL.map(function (e) {
-      return e.replace("http://", "").replace("https://", "").replace(/\/\**$/, "");
-    });
-    var http = BL.map(function (e) {return "http://" + e + "/*"});
-    var https = BL.map(function (e) {return "https://" + e + "/*"});
-    var BL = http.concat(https);
     var contentScript = {
-      blacklist: BL,
       loc: safari.extension.baseURI + 'data/content_script/inject.js'
     };
-    var contentStyle = {
-      blacklist: BL,
-      loc: safari.extension.baseURI + 'data/content_script/inject.css'
-    };
     safari.extension.addContentScriptFromURL(contentScript.loc, contentScript.whitelist, contentScript.blacklist, false);
-    safari.extension.addContentStyleSheetFromURL(contentStyle.loc, contentStyle.whitelist, contentStyle.blacklist, false);
   }
 }
 if (localStorage["allowedURLs"]) {
@@ -207,10 +194,11 @@ if (localStorage["allowedURLs"]) {
 }
 
 function handler(event) {
+  var url = event.message;
   if (localStorage["startStop"] == "Enable") {
     if (event.name === "canLoad") {
       var topLevelUrl = event.target.url;
-      if (event.message != topLevelUrl) { // top url is allowed
+      if (url != topLevelUrl) { // top url is allowed
         var allowedURLs = JSON.parse(localStorage["allowedURLs"]);
         for (var i = 0; i < allowedURLs.length; i++) {
           if (topLevelUrl && topLevelUrl.indexOf(allowedURLs[i]) != -1) {
@@ -218,15 +206,16 @@ function handler(event) {
           }
         }
         for (var j = 0; j < filters.blockedURLs.length; j++) {
-          var flag = (new RegExp('\\b' + filters.blockedURLs[j] + '\\b')).test(event.message);
+          var flag = (new RegExp('\\b' + filters.blockedURLs[j] + '\\b')).test(url);
           if (flag) {
-            //console.error("onBeforeLoad Safari: ", filters.blockedURLs[j]);
+            // console.error("onBeforeLoad Safari: ", filters.blockedURLs[j]);
             event.message = "block";
             return;
           }
         }
-        event.message = "allow";
+        event.message = "init";
       }
+      _safari.content_script.send("allowed-urls", filters.allowedURLs, true);
       _safari.content_script.send("adblock-list", filters.adblockList, true);
       _safari.content_script.send("script-list", filters.scriptList, true);
     }

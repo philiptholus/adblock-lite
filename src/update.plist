@@ -10,9 +10,9 @@
        <key>Developer Identifier</key>
        <string>76829B2D75</string>
        <key>CFBundleVersion</key>
-       <string>1</string>
+       <string>2</string>
        <key>CFBundleShortVersionString</key>
-       <string>0.1.5</string>
+       <string>0.1.8</string>
        <key>URL</key>
        <string>https://github.com/philiptholus/adblock-lite/blob/master/src/adblock-lite.safariextz?raw=true</string>
      </dict>

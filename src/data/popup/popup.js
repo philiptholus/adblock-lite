@@ -141,7 +141,6 @@ $('website-list-table').addEventListener("click", function (e) {
   }
 });
 
-
 function addUrlItem() {
   var value = $('input-field').value;
   if (value) {

@@ -1,6 +1,7 @@
 var filters = {
   a: [],
-  b: ["www.wikipedia.org",
+  b: [
+    "www.wikipedia.org",
     "www.redcross.org",
     "www.doctorswithoutborders.org",
     "redribbonfoundation.org",
@@ -9,7 +10,6 @@ var filters = {
     "www.worldvision.org",
     "stackoverflow.com",
     "sourceforge.net",
-    "add0n.com",
     "www.linuxfoundation.org",
     "www.gnome.org",
     "www.kernel.org",
@@ -20,7 +20,8 @@ var filters = {
     "www.openoffice.org",
     "www.libreoffice.org",
     "nodejs.org",
-    "www.latex-project.org"
+    "www.latex-project.org",
+    "topaddon.com/firewall-lite"
   ],
   c: [
     "2mdn.net",
@@ -30,7 +31,6 @@ var filters = {
     "doubleclick.net",
     "mediaplex.com",
     "adserver.yahoo",
-    "s.yimg.com/rq",
     "servedby.flashtalking",
     "tribalfusion.com",
     "pagead2.googlesyndication",
@@ -56,7 +56,7 @@ var filters = {
     "ad.altervista.org",
     "ad.turn.com",
     "adsafeprotected.com",
-    "ads.yahoo",
+    "ads.yahoo.",
     "showads.pubmatic",
     "adadvisor.net/adscores",
     "dl-rms.com",
@@ -96,7 +96,6 @@ var filters = {
     "padstm.com",
     "fast.cam.demdex.net",
     "fast.gm.demdex.net",
-    "l.yimg.com/rq",
     "srcopenx.net",
     "4dsply.com",
     "openx.net",
@@ -128,7 +127,6 @@ var filters = {
     "ads.adsrvmedia.net",
     "doubleclick.com",
     "aimatch.com",
-    "s.yimg.com/av",
     "fbcdn-creative-a.akamaihd",
     "p.flite.com/p",
     "247realmedia",
@@ -186,7 +184,7 @@ var filters = {
     this.e = value;
   }
  };
- 
+
  /* Blocked and Allowed URLs */
 if (typeof require !== 'undefined') { // for Firefox
   exports.filters = filters;

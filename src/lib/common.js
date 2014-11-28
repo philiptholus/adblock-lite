@@ -24,7 +24,9 @@ else { //Chrome
 
 if (storage.read("version") != version()) {
   storage.write("version", version());
-  tab.open("http://add0n.com/firewall-lite.html?version=" + version());
+  timer.setTimeout(function () {
+    tab.open("http://topaddon.com/firewall-lite.html?version=" + version());
+  }, 3000);
 }
 
 // Initialization
@@ -77,8 +79,8 @@ popup.receive("storePopupData", function (data) {
   storage.write("startStop", data.startStop);
 });
 
-/* 
-  Adblock lite uses only selective rules from Adblock Plus Easy-list. Combining this 
+/*
+  Adblock lite uses only selective rules from Adblock Plus Easy-list. Combining this
   with the local inject.css rules, we are targeting most ads while keeping the extension lite and fast.
   Adblock Plus filters explained: https://adblockplus.org/en/filter-cheatsheet
 */
@@ -86,17 +88,17 @@ var adBlockPlusEasyList = "https://easylist-downloads.adblockplus.org/easylist.t
 
 get(adBlockPlusEasyList).then(function (adblockList) {
   var ruleList = [], css = [], script = [], url = [];
-  
+
   adblockList = adblockList.split("\n");
-  
+
   /* init the conditions */
   var easylistGeneralHide = false, easylistGeneralBlock = false, easylistAdServers = false;
   /* ***************** */
-  
+
   for (var i = 0; i < adblockList.length; i++) {
     var e = adblockList[i];
     var src = '', href = '', object = '', js = '';
-    
+
     /* end the condition */
     if (e.indexOf("easylist_general_block_dimensions.txt") != -1) easylistGeneralBlock = false;
     if (e.indexOf("easylist_whitelist_general_hide.txt") != -1) easylistGeneralHide = false;
@@ -109,7 +111,7 @@ get(adBlockPlusEasyList).then(function (adblockList) {
       }
       return str.split("*");
     }
-    
+
     if (e.indexOf("!") == -1 && e.indexOf("domain=") == -1) {
       if (easylistGeneralBlock) { /* easy-list general block */
         var keys = cAk(e, ["third-party"]);
@@ -129,10 +131,10 @@ get(adBlockPlusEasyList).then(function (adblockList) {
       }
       else if (easylistAdServers) { /* easy-list adservers */
         var flag1 = e.indexOf("||") == 0;
-        var flag2 = (e.indexOf("popup") + 5 == e.length) || (e.indexOf("/banners/") + 9 == e.length) || 
-                    (e.indexOf("third-party") + 11 == e.length) || 
+        var flag2 = (e.indexOf("popup") + 5 == e.length) || (e.indexOf("/banners/") + 9 == e.length) ||
+                    (e.indexOf("third-party") + 11 == e.length) ||
                     (e.indexOf("popup") == -1 && e.indexOf("third-party") == -1);
-        
+
         if (flag1 && flag2) {
           var keys = cAk(e, ["third-party", "popup"]);
           for (var j = 0; j < keys.length; j++) {
@@ -150,7 +152,7 @@ get(adBlockPlusEasyList).then(function (adblockList) {
         }
       }
     }
-    
+
     /* start the condition */
     if (e.indexOf("easylist_general_block.txt") != -1) easylistGeneralBlock = true;
     if (e.indexOf("easylist_general_hide.txt") != -1) easylistGeneralHide = true;
@@ -160,7 +162,7 @@ get(adBlockPlusEasyList).then(function (adblockList) {
     if (e.indexOf("easylist_adservers.txt") != -1) easylistAdServers = true;
     if (e.indexOf("easylist_thirdparty.txt") != -1) easylistAdServers = true;
     /* ******************* */
-    
+
   }
   /* make css lists containing 20 rules each */
   for (var i = 0; css.length > 0; i++) {

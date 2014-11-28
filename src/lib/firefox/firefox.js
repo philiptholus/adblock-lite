@@ -69,58 +69,6 @@ if (prefs.startStop == "Enable" && prefs.allowedURLs) {
   myPageMode = insertContentScript();
 }
 
-var httpRequestObserver = {
-  observe: function(subject, topic, data) {
-    if (topic == "http-on-modify-request") {
-      var httpChannel = subject.QueryInterface(Ci.nsIHttpChannel);
-      var startStop = prefs.startStop;
-      var url = httpChannel.URI.spec;
-      var isTopLevel = httpChannel.loadFlags & httpChannel.LOAD_INITIAL_DOCUMENT_URI;
-      var allowHttpChannel = true;
-      try {
-        var noteCB = httpChannel.notificationCallbacks ? httpChannel.notificationCallbacks : httpChannel.loadGroup.notificationCallbacks;
-        if (noteCB) { 
-          var domWin = noteCB.getInterface(Ci.nsIDOMWindow);
-          var topLevelUrl = domWin.top.document.location.href;
-          var allowedURLs = prefs.allowedURLs;
-          for (var i = 0; i < allowedURLs.length; i++) {
-            if (topLevelUrl.indexOf(allowedURLs[i]) != -1) {
-              allowHttpChannel = false;
-              break;
-            }
-          }
-        }
-      } 
-      catch (e) {}
-      if (allowHttpChannel && startStop == "Enable" && isTopLevel == 0) {
-        for (var i = 0; i < filters.blockedURLs.length; i++) {
-          var flag = (new RegExp('\\b' + filters.blockedURLs[i] + '\\b')).test(url);
-          if (flag) {
-            httpChannel.cancel(Cr.NS_BINDING_ABORTED);
-            //console.error("http-on-modify-request: ", filters.blockedURLs[i]);
-            break;
-          }
-        }
-      }
-      exports.content_script.send("clearAdBlock", "", true);
-    }
-  },
-  get observerService() {
-    return Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-  },
-  register: function() {
-    this.observerService.addObserver(this, "http-on-modify-request", false);
-  },
-  unregister: function() {
-    this.observerService.removeObserver(this, "http-on-modify-request");
-  }
-};
-httpRequestObserver.register();
-unload.when(function () {
-  httpRequestObserver.unregister();
-})
-/* ************************************* */
-
 var popup = require("sdk/panel").Panel({
   width: 450,
   height: 418,
@@ -224,7 +172,7 @@ exports.tab = {
   openOptions: function () {
     var optionsTab = false;
     for each (var tab in tabs) {
-      if (tab.url.indexOf("dgnibwqga0sibw-at-jetpack/igtranslator") != -1) {
+      if (tab.url.indexOf("dwtFBkQjb3SIQp-at-jetpack/adblock-lite") != -1) {
         tab.reload();            // reload the options tab
         tab.activate();          // activate the options tab
         tab.window.activate();   // activate the options tab window
@@ -298,3 +246,96 @@ exports.Promise = Promise;
 exports.Deferred = Promise.defer;
 
 sp.on("settings", exports.tab.openOptions);
+
+var httpRequestMethod = "http-on-examine-response";
+
+/* (--- This method introduces lag to Firefox ---)
+events.on(httpRequestMethod, function (event) {
+  var httpChannel = event.subject.QueryInterface(Ci.nsIHttpChannel);
+  var startStop = prefs.startStop;
+  var url = httpChannel.URI.spec;
+  var isTopLevel = httpChannel.loadFlags & httpChannel.LOAD_INITIAL_DOCUMENT_URI;
+  var allowHttpChannel = true;
+  try {
+    var noteCB = httpChannel.notificationCallbacks ? httpChannel.notificationCallbacks : httpChannel.loadGroup.notificationCallbacks;
+    if (noteCB) {
+      var domWin = noteCB.getInterface(Ci.nsIDOMWindow);
+      var topLevelUrl = domWin.top.document.location.href;
+      var allowedURLs = prefs.allowedURLs;
+      for (var i = 0; i < allowedURLs.length; i++) {
+        if (topLevelUrl.indexOf(allowedURLs[i]) != -1) {
+          allowHttpChannel = false;
+          break;
+        }
+      }
+    }
+  } 
+  catch (e) {}
+  if (allowHttpChannel && startStop == "Enable" && isTopLevel == 0) {
+    for (var i = 0; i < filters.blockedURLs.length; i++) {
+      var flag = (new RegExp('\\b' + filters.blockedURLs[i] + '\\b')).test(url);
+      if (flag) {
+        httpChannel.cancel(Cr.NS_BINDING_ABORTED);
+        //console.error("http-on-modify-request: ", filters.blockedURLs[i]);
+        break;
+      }
+    }
+  }
+  exports.content_script.send("clearAdBlock", "", true);
+}, true);
+*/
+
+var httpRequestObserver = {
+  observe: function(subject, topic, data) {
+    if (topic == httpRequestMethod) {
+      var httpChannel = subject.QueryInterface(Ci.nsIHttpChannel);
+      try {
+        var type = httpChannel.contentType;
+        if (type == "text/javascript" || type == "image/gif") {
+          var startStop = prefs.startStop;
+          var url = httpChannel.URI.spec;
+          var isTopLevel = httpChannel.loadFlags & httpChannel.LOAD_INITIAL_DOCUMENT_URI;
+          var allowHttpChannel = true;
+          try {
+            var noteCB = httpChannel.notificationCallbacks ? httpChannel.notificationCallbacks : httpChannel.loadGroup.notificationCallbacks;
+            if (noteCB) { 
+              var domWin = noteCB.getInterface(Ci.nsIDOMWindow);
+              var topLevelUrl = domWin.top.document.location.href;
+              var allowedURLs = prefs.allowedURLs;
+              for (var i = 0; i < allowedURLs.length; i++) {
+                if (topLevelUrl.indexOf(allowedURLs[i]) != -1) {
+                  allowHttpChannel = false;
+                  break;
+                }
+              }
+            }
+          } 
+          catch (e) {}
+          if (allowHttpChannel && startStop == "Enable" && isTopLevel == 0) {
+            for (var i = 0; i < filters.blockedURLs.length; i++) {
+              var flag = (new RegExp('\\b' + filters.blockedURLs[i] + '\\b')).test(url);
+              if (flag) {
+                httpChannel.cancel(Cr.NS_BINDING_ABORTED);
+                //console.error("http-on-modify-request: ", filters.blockedURLs[i]);
+                break;
+              }
+            }
+          }
+          exports.content_script.send("clearAdBlock", '', true);
+        }
+      }
+      catch (e) {}
+    }
+  },
+  get observerService() {
+    return Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+  },
+  register: function() {
+    this.observerService.addObserver(this, httpRequestMethod, false);
+  },
+  unregister: function() {
+    this.observerService.removeObserver(this, httpRequestMethod);
+  }
+};
+httpRequestObserver.register();
+unload.when(function () {httpRequestObserver.unregister();})

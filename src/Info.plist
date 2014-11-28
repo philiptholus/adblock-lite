@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.5</string>
+	<string>0.1.8</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Database Quota</key>
@@ -75,6 +75,6 @@
 	<key>Update Manifest URL</key>
 	<string>https://raw.githubusercontent.com/philiptholus/adblock-lite/master/src/update.plist</string>
 	<key>Website</key>
-	<string>http://add0n.com/firewall-lite.html</string>
+	<string>http://topaddon.com/firewall-lite.html</string>
 </dict>
 </plist>
