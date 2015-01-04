@@ -214,7 +214,8 @@ function handler(event) {
         */
         event.message = {
           name: "injectCss",
-          text: localStorage["highlight"]
+          text: localStorage["highlight"],
+          fullLite: localStorage["fullLite"]
         };
       }
       _safari.content_script.send("script-list", filters.scriptList, true);

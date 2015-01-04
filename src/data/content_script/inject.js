@@ -54,7 +54,9 @@ else if (typeof safari !== 'undefined') { /* Safari */
     try {
       var answer = safari.self.tab.canLoad(event, event.url);
       if ((answer.name == "injectCss")) {
+        /* 'answer' is an object received from safari background-page */
         highlight = answer.text;
+        fullLite = answer.fullLite;
         injectCSS();
         window.removeEventListener("beforeload", doBlock, true);
       }
