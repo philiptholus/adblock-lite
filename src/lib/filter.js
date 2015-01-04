@@ -1,6 +1,7 @@
 var filters = {
   a: [],
   b: [
+    "topaddon.com/firewall-lite",
     "www.wikipedia.org",
     "www.redcross.org",
     "www.doctorswithoutborders.org",
@@ -20,8 +21,7 @@ var filters = {
     "www.openoffice.org",
     "www.libreoffice.org",
     "nodejs.org",
-    "www.latex-project.org",
-    "topaddon.com/firewall-lite"
+    "www.latex-project.org"
   ],
   c: [
     "2mdn.net",

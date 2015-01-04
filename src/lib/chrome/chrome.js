@@ -1,4 +1,6 @@
 var _chrome = {
+  timer: window,
+  
   storage: {
     read: function (id) {
       return localStorage[id] || null;
@@ -8,11 +10,9 @@ var _chrome = {
     }
   },
   
-  timer: window,
-  
   get: function (url, headers, data) {
     var xhr = new XMLHttpRequest();
-    var deferred = new task.Deferred();
+    var deferred = Promise.defer();
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
         if (xhr.status >= 400 || xhr.status < 200) {
@@ -181,6 +181,7 @@ function allowContentScript(url) {
     "addons.opera",
     "chrome-devtools://",
     "data:text/html,chromewebdata",
+    "opera://",
     "opera://extensions",
     "opera://plugins",
     "opera://downloads",
@@ -196,6 +197,7 @@ function allowContentScript(url) {
     "opera://remote-debug",
     "opera://remote-debug",
     "opera://gpu",
+    "chrome://",
     "chrome://extensions",
     "chrome://plugins",
     "chrome://downloads",
@@ -249,8 +251,8 @@ function insertContentScript(e) {
       }
       chrome.tabs.executeScript(e.id, jsObj, function (e) {
         _chrome.content_script.send("fullLite", _chrome.storage.read("fullLite"), true);
+        _chrome.content_script.send("highlight", _chrome.storage.read("highlight"), true);
         _chrome.content_script.send("adblock-list", filters.adblockList, true);
-        _chrome.content_script.send("script-list", filters.scriptList, true);
       });
     }
     catch (e) {}
@@ -258,9 +260,13 @@ function insertContentScript(e) {
   if (allowContentScript(e.url)) {
     try {
       var cssObj;
+      var cssStr = "data/content_script/inject_b.css";
+      if (_chrome.storage.read("highlight") == "highlight") {
+        cssStr = "data/content_script/inject_h.css";
+      }
       if (chromeVersion >= 39) {
         cssObj = { // insert css
-          file: "data/content_script/inject.css",
+          file: cssStr,
           allFrames: true,
           matchAboutBlank: true,
           runAt: "document_start"
@@ -268,7 +274,7 @@ function insertContentScript(e) {
       }
       else {
         cssObj = { // insert css
-          file: "data/content_script/inject.css",
+          file: cssStr,
           allFrames: true,
           runAt: "document_start"
         };
@@ -278,44 +284,6 @@ function insertContentScript(e) {
     catch (e) {}
   }
 }
-
-try {
-  _chrome.webRequest.onBeforeRequest(function (details) {
-    var burls = filters.blockedURLs;
-    var burlsLength = burls.length;
-    
-    chrome.tabs.query({}, function (tabs) {
-      for (var i = 0; i < tabs.length; i++) {
-        if (details.tabId == tabs[i].id) {
-          var topLevelURL = tabs[i].url
-          if (details.url == topLevelURL) {
-            // Allow tab (top level) url to load
-          }
-          else if (allowContentScript(topLevelURL)) {
-            var type = details.type.toLowerCase();
-            if (type == "script") {
-              _chrome.content_script.send("clearAdBlock", "", true);
-            }
-            if (type == "script" || type == "image" || type == "sub_frame") {
-              /* -- Do not concat the adServers for now --
-                if (burls.length == burlsLength) burls = burls.concat(filters.adServer);
-              */
-              for (var j = 0; j < burls.length; j++) {
-                var flag = (new RegExp('\\b' + burls[j] + '\\b')).test(details.url);
-                if (flag) {
-                  //console.error("onBeforeRequest: ", burls[j]);
-                  return {cancel: true};
-                }
-              }
-            }
-          }
-          break;
-        }
-      }
-    });
-  }, {urls: ["<all_urls>"]}, ["blocking"]);
-}
-catch (e) {}
 
 chrome.tabs.onCreated.addListener(insertContentScript);
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, e) {

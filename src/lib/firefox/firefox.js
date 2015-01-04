@@ -35,14 +35,14 @@ function insertContentScript() {
     contentScriptFile: [data.url("content_script/inject.js")],
     contentScriptWhen: "start",
     contentScriptOptions: {
-      allowedURLs: JSON.parse(prefs.allowedURLs),
+      manifest: self,
       fullLite: prefs.fullLite, 
-      manifest: self
+      highlight: prefs.highlight,
+      allowedURLs: JSON.parse(prefs.allowedURLs),
     },
     onAttach: function(worker) {
       worker.port.emit("topLevelUrl", worker.tab.url);
       worker.port.emit("adblock-list", filters.adblockList);
-      worker.port.emit("script-list", filters.scriptList);
       array.add(workers, worker);
       worker.on('pageshow', function() { array.add(workers, this); });
       worker.on('pagehide', function() { array.remove(workers, this); });
@@ -63,6 +63,7 @@ function reRunPageMode() {
 }
 sp.on("fullLite", reRunPageMode);
 sp.on("startStop", reRunPageMode);
+sp.on("highlight", reRunPageMode);
 sp.on("allowedURLs", reRunPageMode);
 
 if (prefs.startStop == "Enable" && prefs.allowedURLs) {
@@ -183,53 +184,8 @@ exports.tab = {
   }
 }
 
-exports.context_menu = {
-  create: function (title, type, callback) {
-    var menuItem = contextMenu.Item({
-      label: title,
-      image: data.url('./icon16.png'),
-      context: type == 'selection' ? contextMenu.SelectionContext() : contextMenu.PageContext(),
-      contentScript: 'self.on("click", function () {self.postMessage();});',
-      onMessage: function () {
-        callback();
-      }
-    });
-  }
-}
-
 exports.version = function () {
   return self.version;
-}
-
-exports.notification = (function () { // https://github.com/fwenzel/copy-shorturl/blob/master/lib/simple-notify.js
-  return function (title, text) {
-    try {
-      let alertServ = Cc["@mozilla.org/alerts-service;1"].
-                      getService(Ci.nsIAlertsService);
-      alertServ.showAlertNotification(data.url("icon32.png"), title, text, null, null, null, "");
-    }
-    catch(e) {
-      let browser = window.active.gBrowser,
-          notificationBox = browser.getNotificationBox();
-
-      notification = notificationBox.appendNotification(text, 'jetpack-notification-box',
-          data.url("icon32.png"), notificationBox.PRIORITY_INFO_MEDIUM, []
-      );
-      timer.setTimeout(function() {
-          notification.close();
-      }, 5000);
-    }
-  }
-})();
-
-exports.play = function (url) {
-  var worker = pageWorker.Page({
-    contentScript: "var audio = new Audio('" + url + "'); audio.addEventListener('ended', function () {self.postMessage()}); audio.volume = 1; audio.play();",
-    contentURL: data.url("firefox/sound.html"),
-    onMessage: function(arr) {
-      worker.destroy();
-    }
-  });
 }
 
 exports.icon = function (type) {
@@ -241,101 +197,7 @@ exports.icon = function (type) {
   button.icon = icon;
 }
 
-exports.window = windowUtils.getMostRecentBrowserWindow();
 exports.Promise = Promise;
 exports.Deferred = Promise.defer;
-
+exports.window = windowUtils.getMostRecentBrowserWindow();
 sp.on("settings", exports.tab.openOptions);
-
-var httpRequestMethod = "http-on-examine-response";
-
-/* (--- This method introduces lag to Firefox ---)
-events.on(httpRequestMethod, function (event) {
-  var httpChannel = event.subject.QueryInterface(Ci.nsIHttpChannel);
-  var startStop = prefs.startStop;
-  var url = httpChannel.URI.spec;
-  var isTopLevel = httpChannel.loadFlags & httpChannel.LOAD_INITIAL_DOCUMENT_URI;
-  var allowHttpChannel = true;
-  try {
-    var noteCB = httpChannel.notificationCallbacks ? httpChannel.notificationCallbacks : httpChannel.loadGroup.notificationCallbacks;
-    if (noteCB) {
-      var domWin = noteCB.getInterface(Ci.nsIDOMWindow);
-      var topLevelUrl = domWin.top.document.location.href;
-      var allowedURLs = prefs.allowedURLs;
-      for (var i = 0; i < allowedURLs.length; i++) {
-        if (topLevelUrl.indexOf(allowedURLs[i]) != -1) {
-          allowHttpChannel = false;
-          break;
-        }
-      }
-    }
-  } 
-  catch (e) {}
-  if (allowHttpChannel && startStop == "Enable" && isTopLevel == 0) {
-    for (var i = 0; i < filters.blockedURLs.length; i++) {
-      var flag = (new RegExp('\\b' + filters.blockedURLs[i] + '\\b')).test(url);
-      if (flag) {
-        httpChannel.cancel(Cr.NS_BINDING_ABORTED);
-        //console.error("http-on-modify-request: ", filters.blockedURLs[i]);
-        break;
-      }
-    }
-  }
-  exports.content_script.send("clearAdBlock", "", true);
-}, true);
-*/
-
-var httpRequestObserver = {
-  observe: function(subject, topic, data) {
-    if (topic == httpRequestMethod) {
-      var httpChannel = subject.QueryInterface(Ci.nsIHttpChannel);
-      try {
-        var type = httpChannel.contentType;
-        if (type == "text/javascript" || type == "image/gif") {
-          var startStop = prefs.startStop;
-          var url = httpChannel.URI.spec;
-          var isTopLevel = httpChannel.loadFlags & httpChannel.LOAD_INITIAL_DOCUMENT_URI;
-          var allowHttpChannel = true;
-          try {
-            var noteCB = httpChannel.notificationCallbacks ? httpChannel.notificationCallbacks : httpChannel.loadGroup.notificationCallbacks;
-            if (noteCB) { 
-              var domWin = noteCB.getInterface(Ci.nsIDOMWindow);
-              var topLevelUrl = domWin.top.document.location.href;
-              var allowedURLs = prefs.allowedURLs;
-              for (var i = 0; i < allowedURLs.length; i++) {
-                if (topLevelUrl.indexOf(allowedURLs[i]) != -1) {
-                  allowHttpChannel = false;
-                  break;
-                }
-              }
-            }
-          } 
-          catch (e) {}
-          if (allowHttpChannel && startStop == "Enable" && isTopLevel == 0) {
-            for (var i = 0; i < filters.blockedURLs.length; i++) {
-              var flag = (new RegExp('\\b' + filters.blockedURLs[i] + '\\b')).test(url);
-              if (flag) {
-                httpChannel.cancel(Cr.NS_BINDING_ABORTED);
-                //console.error("http-on-modify-request: ", filters.blockedURLs[i]);
-                break;
-              }
-            }
-          }
-          exports.content_script.send("clearAdBlock", '', true);
-        }
-      }
-      catch (e) {}
-    }
-  },
-  get observerService() {
-    return Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-  },
-  register: function() {
-    this.observerService.addObserver(this, httpRequestMethod, false);
-  },
-  unregister: function() {
-    this.observerService.removeObserver(this, httpRequestMethod);
-  }
-};
-httpRequestObserver.register();
-unload.when(function () {httpRequestObserver.unregister();})

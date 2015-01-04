@@ -57,7 +57,7 @@ else {  // Firefox
 }
 /**** wrapper (end) ****/
 
-var allowedURLs = [], startStop = "", fullLite = "";
+var allowedURLs = [], startStop = '', fullLite = '', highlight = '';
 
 function $ (id) {
   return document.getElementById(id);
@@ -67,6 +67,7 @@ function popupStart() {
   background.receive('popupStart', function (data) {
     fullLite = data.fullLite;
     startStop = data.startStop;
+    highlight = data.highlight;
     allowedURLs = data.allowedURLs;
     init();
   });
@@ -97,13 +98,26 @@ function init() {
     table.appendChild(tr);
     count++;
   }
-  var startStopTextContent = "", fullLiteTextContent = "";
+  var fullLiteTextContent = '';
+  var highlightTextContent = '';
+  var startStopTextContent = ''; 
+  /* ***** */
   if (startStop == "Enable") startStopTextContent = "Enabled";
   if (startStop == "Disable") startStopTextContent = "Disabled";
   if (fullLite == "Full") fullLiteTextContent = "Full Mode";
   if (fullLite == "Lite") fullLiteTextContent = "Lite Mode";
+  if (highlight == "block") highlightTextContent = "Block Ads";
+  if (highlight == "highlight") highlightTextContent = "Highlight Ads";
+  /* ***** */
+  $('highlight-ads-button').textContent = highlightTextContent;
   $('start-stop-button').textContent = startStopTextContent;
   $('full-lite-button').textContent = fullLiteTextContent;
+   /* ***** */
+  $('highlight-ads-button-td-info').textContent = "Adblock Will " + highlightTextContent;
+  $('start-stop-button-td-info').textContent = "Adblock is " + startStopTextContent;
+  $('full-lite-button-td-info').textContent = fullLiteTextContent + " is Activated";
+  /* ***** */
+  $('highlight-ads-button').setAttribute("state", highlight);
   $('start-stop-button').setAttribute("state", startStop);
   $('full-lite-button').setAttribute("state", fullLite);
 }
@@ -112,7 +126,8 @@ function storePopupData() {
   background.send("storePopupData", {
     allowedURLs: JSON.stringify(allowedURLs),
     fullLite: $('full-lite-button').getAttribute("state"),
-    startStop: $('start-stop-button').getAttribute("state")
+    startStop: $('start-stop-button').getAttribute("state"),
+    highlight: $('highlight-ads-button').getAttribute("state")
   });
 }
 
@@ -125,6 +140,12 @@ $('full-lite-button').addEventListener("click", function (e) {
   if ($('start-stop-button').getAttribute("state") == "Disable") return;
   var target = e.target || e.originalTarget;
   background.send('fullLite', target.getAttribute("state"));
+});
+
+$('highlight-ads-button').addEventListener("click", function (e) {
+  if ($('start-stop-button').getAttribute("state") == "Disable") return;
+  var target = e.target || e.originalTarget;
+  background.send('highlight', target.getAttribute("state"));
 });
 
 $('website-list-table').addEventListener("click", function (e) {
@@ -153,7 +174,7 @@ function addUrlItem() {
   }
   else {
     var text = $('input-field').getAttribute('title');
-    // alert(text);
+    /* alert(text); */
   }
 }
 
@@ -168,15 +189,29 @@ background.receive('startStop', function (e) {
   if (e == "Enable") startStopTextContent = "Enabled";
   if (e == "Disable") startStopTextContent = "Disabled";
   $('start-stop-button').textContent = startStopTextContent;
+  $('start-stop-button-td-info').textContent = "Adblock is " + startStopTextContent;
   $('start-stop-button').setAttribute("state", e);
 });
 
 background.receive('fullLite', function (e) {
   var fullLiteTextContent = "";
+  if (e == "Full") {
+    alert("Full Mode is Activated! \nPlease note, Full-Mode will target more Ads but may significantly slow-down your browser's speed and responsiveness depending on the available Memory and CPU power.");
+  }
   if (e == "Full") fullLiteTextContent = "Full Mode";
   if (e == "Lite") fullLiteTextContent = "Lite Mode";
   $('full-lite-button').textContent = fullLiteTextContent;
+  $('full-lite-button-td-info').textContent = fullLiteTextContent + " is Activated";
   $('full-lite-button').setAttribute("state", e);
+});
+
+background.receive('highlight', function (e) {
+  var highlightTextContent = "";
+  if (e == "block") highlightTextContent = "Block Ads";
+  if (e == "highlight") highlightTextContent = "Highlight Ads";
+  $('highlight-ads-button').textContent = highlightTextContent;
+  $('highlight-ads-button-td-info').textContent = "Adblock Will " + highlightTextContent;
+  $('highlight-ads-button').setAttribute("state", e);
 });
 
 var information = "In AdBlock-Lite you can allow some websites to show advertisement. By doing this you support websites that rely on advertising but choose to do it in a non-intrusive way. Some websites are added by default, but the above list can be modified at any time.";
@@ -185,10 +220,6 @@ $('information-span').textContent = information;
 document.addEventListener("mouseover", function (e) {
   var target = e.target || e.originalTarget;
   var title = target.getAttribute("title");
-  if (title) {
-    $('information-span').textContent = title;
-  }
-  else {
-    $('information-span').textContent = information;
-  }
+  if (title) $('information-span').textContent = title;
+  else $('information-span').textContent = information;
 });

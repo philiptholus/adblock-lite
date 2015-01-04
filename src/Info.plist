@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Philip Tholus</string>
 	<key>Builder Version</key>
-	<string>10600.1.25</string>
+	<string>10600.1.25.1</string>
 	<key>CFBundleDisplayName</key>
 	<string>AdBlock Lite</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.8</string>
+	<string>0.2.1</string>
 	<key>CFBundleVersion</key>
 	<string>2</string>
 	<key>Chrome</key>

@@ -138,12 +138,10 @@ var _safari = {
   })(),
 
   context_menu: (function () {
-    var onSelection = [];
     var onPage = [];
-
+    var onSelection = [];
     safari.application.addEventListener("contextmenu", function (e) {
       var selected = e.userInfo && "selectedText" in e.userInfo && e.userInfo.selectedText;
-
       onPage.forEach(function (arr, i) {
         e.contextMenu.appendContextMenuItem("igtranslator.onPage:" + i, arr[0]);
       });
@@ -164,7 +162,6 @@ var _safari = {
         onSelection[i][1]();
       }
     }, false);
-
     return {
       create: function (title, type, callback) {
         if (type == "page") {
@@ -205,6 +202,7 @@ function handler(event) {
             return false;
           }
         }
+        /*
         for (var j = 0; j < filters.blockedURLs.length; j++) {
           var flag = (new RegExp('\\b' + filters.blockedURLs[j] + '\\b')).test(url);
           if (flag) {
@@ -213,11 +211,15 @@ function handler(event) {
             return;
           }
         }
-        event.message = "init";
+        */
+        event.message = {
+          name: "injectCss",
+          text: localStorage["highlight"]
+        };
       }
+      _safari.content_script.send("script-list", filters.scriptList, true);
       _safari.content_script.send("allowed-urls", filters.allowedURLs, true);
       _safari.content_script.send("adblock-list", filters.adblockList, true);
-      _safari.content_script.send("script-list", filters.scriptList, true);
     }
   }
 }

@@ -5,7 +5,7 @@ body {
   width: 450px;
   height: 418px;
   overflow: hidden;
-  font-size: 20px;
+  font-size: 16px;
   font-family: Arial, Helvetica, sans-serif;
   background-color: #fff;
   -webkit-user-select: none;
@@ -94,21 +94,24 @@ span {
 #website-list-table tr {
   background: url('background.png') repeat;
 }
-#start-stop-button, #full-lite-button {
+#highlight-ads-button,
+#start-stop-button,
+#full-lite-button {
   display: block;
   margin: auto;
-  width: 190px;
-  height: 40px;
+  width: 125px;
+  height: 30px;
   color: white;
-  line-height: 40px;
+  line-height: 30px;
   text-align: center;
   vertical-align: middle;
   background-color: #4285F4;
   -webkit-transition: 300ms background-color;
   -moz-transition: 300ms background-color;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 -1px 0 rgba(0, 0, 0, 0.15) inset;
+  box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 -1px 0 rgba(0, 0, 0, 0.15) inset;
 }
+#highlight-ads-button:hover,
 #start-stop-button:hover,
 #start-stop-button[state='Enable']:hover {
   background-color: #5291f2;
@@ -116,6 +119,7 @@ span {
   -moz-transition: 0ms background-color;
 }
 #full-lite-button:hover,
+#highlight-ads-button[state='highlight']:hover,
 #full-lite-button[state='Full']:hover {
   background-color: #CC3B44;
   -webkit-transition: 0ms background-color;
@@ -139,9 +143,22 @@ span {
 #full-lite-button[state='Full'] {
   background-color: #CC181E;
 }
-#start-stop-button-td, #full-lite-button-td {
-  height: 70px;
+#highlight-ads-button[state='highlight'] {
+  background-color: #CC181E;
+}
+#highlight-ads-button-td,
+#start-stop-button-td,
+#full-lite-button-td {
+  height: 45px;
+  width: 150px;
   background-color: #EEEEEE;
+}
+#highlight-ads-button-td-info,
+#start-stop-button-td-info,
+#full-lite-button-td-info {
+  font-size: 11px;
+  text-align: center;
+  background-color: #D3D3D3;
 }
 #input-field {
   height: 30px;
@@ -154,7 +171,6 @@ span {
   width: 30px;
   height: 30px;
   background: #4285F4 url('add.png') no-repeat center center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 -1px 0 rgba(0, 0, 0, 0.15) inset;
   cursor: pointer;
 }
 #input-field-add:hover {
