@@ -23,8 +23,9 @@
 .advertisement,
 .advertisements,
 .ad-leaderboard {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 .adunit,
@@ -34,6 +35,7 @@
 .top-ad ,
 .left-ad,
 .right-ad,
+.ad-label,
 .ads-bbll,
 .bottom-ad,
 .footer-ad,
@@ -44,8 +46,9 @@
 .ads_arrow_left,
 .ads_arrow_right,
 .adsCategoryTitleLink {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 #ad,
@@ -68,38 +71,50 @@
 #ad-background,
 #adbarContainer,
 #RadAd_Skyscraper  {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
+} 
+
+#ad-case  {
+  color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 form[action*="doubleclick."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 ins[class*="adsbygoogle"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 article[class*="--sponsored"]{
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 li[class*="ads-ad"],
 li[class*="featured-ads"],
 li[class*=" promoted-trend"],
 li[class*=" linkedin-sponsor"]{
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 param[value*="googleadservices."],
 param[value*="cdnx.tribalfusion"],
 param[data*="pagead2.googlesyndication"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 embed[src*="2mdn."],
@@ -107,8 +122,9 @@ embed[src*="spe.atdmt."],
 embed[src*="h2.msn.com/CIS"],
 embed[flashvars*="fastclick."],
 embed[src*="ads.contentabc."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 span[class*="adchoice"],
@@ -121,8 +137,9 @@ span[title="Why this ad?"],
 span[class*="featured-ads"],
 span[title="Why these ads?"],
 span[class*="sponsored-icon"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 object[data*="s.yimg."],
@@ -132,8 +149,9 @@ object[data*="2mdn.net/ads"],
 object[data*="cdn.flashtalking"],
 object[data*="pagead2.googlesyndication"],
 object[data*="cdnx.tribalfusion"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 div[id*="adunit"],
@@ -156,8 +174,9 @@ div[class*="adspace-widget"],
 div[class*="commercial-unit"],
 div[onclick*="MyAdvertisements"],
 div[class*="ads-visurl"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 div[class="ads"],
@@ -180,8 +199,9 @@ div[class*="advertisement"],
 div[class*="-link-sponsored"],
 div[class*="-content-sponsored"],
 div[id*="google_ads_"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 div[class^="ad-"],
@@ -204,8 +224,9 @@ div[id*="ad-fullbanner"],
 div[id*="ads_container"],
 div[id*="ad-skyscraper"],
 div[data-item-thumb*="cdn.taboolasyndication"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 div[id*="-ad-"],
@@ -228,13 +249,23 @@ div[data-role*="adloader"],
 div[class*=" promoted-account "],
 div[data-annotation_id*="annotation_"],
 div[id*="ad-slot"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
+}
+
+div[class*="AdBox"],
+div[data-xt-vimp*="duration_in_ms"] {
+  color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 iframe[src*="padstm."],
 iframe[src*="clkrev."],
 iframe[src*="chitika."],
+iframe[id*="AdWrapper"],
+iframe[src*="cuelinks."],
 iframe[src*="srcopenx."],
 iframe[src*="mediaplex."],
 iframe[src*="cdn.betrad."],
@@ -250,8 +281,9 @@ iframe[src*="fast.gm.demdex."],
 iframe[src*="fast.cam.demdex."],
 iframe[src*="servedby.flashtalking"],
 iframe[src*="4dsply.com"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 iframe[src*="/0AD"],
@@ -274,8 +306,9 @@ iframe[src*="linkedin.com/csp/ads"],
 iframe[src*="tpc.googlesyndication"],
 iframe[src*="ads.as4x.tmcs.ticketmaster"],
 iframe[src*="cdn.flashtalking"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 iframe[src*="betaffs."],
@@ -298,8 +331,9 @@ iframe[src*="syndication.exoclick."],
 iframe[src*="syndication.traffichaus.com/adserve"],
 iframe[src*="syndication.globaltraffico.com/adserve"],
 iframe[src*="cdn.zeusclicks.com/ads/"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 iframe[src*="an.z5x."],
@@ -321,8 +355,9 @@ iframe[src*="banners.sexypartners"],
 iframe[src*="static.re-markable00."],
 iframe[src*="altare.sitescoutadserver"],
 iframe[src*="syndication.cntrafficpro"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 iframe[src*="ad."],
@@ -345,8 +380,9 @@ iframe[src*="adjuggler"],
 iframe[src*="cas.criteo"],
 iframe[src*="transfer.go"],
 iframe[src*="bluestreak"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 iframe[class^="adbar_"],
@@ -356,8 +392,9 @@ iframe[src*="trackoffer."],
 iframe[src*="fd.rad.msn."],
 iframe[src*="tracksponsor."],
 iframe[id*="merchandisingMERC"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 img[src*="/ads/"],
@@ -376,8 +413,9 @@ img[src*="bs.serving-sys"],
 img[src*=".banners.advidi"],
 img[src*=".cdntraffic.com/ads"],
 img[src*="static.fl-ads.com/Advertisers"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 img[src*="adk2"],
@@ -398,8 +436,9 @@ img[src*="padsdel.cdnads"],
 img[src*="exoclick.com/banners"],
 img[src*="fbcdn-creative-a.akamaihd"],
 img[src*="pagead2.googlesyndication"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 a[class*="adchoice"] img,
@@ -422,8 +461,9 @@ a[href*="pagead2.googlesyndication"] img,
 a[href*="facebook.com/campaign/landing"] img,
 a[href*="campaign/landing.php?placement"] img,
 a[href*="syndication.globaltraffico.com/adserve/"] img {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 a[href*="ad."]  img, 
@@ -434,6 +474,8 @@ a[href*="/adshows/"] img,
 a[href*="fastclick."] img,
 a[class*="AdChoices"] img,
 a[href*="ad-choices"] img,
+a[href*="shareasale."] img,
+a[href*="/advertising/"] em,
 a[href*="engine.fl-ads"] img,
 a[href*="ads_preference"] img,
 a[href*="/tag/sponsored"] img,
@@ -444,8 +486,9 @@ a[class*="-promoted-badge "] img,
 a[href*="banners.sexypartners"] img,
 a[href*="main.exoclick.com/click"] img,
 a[href*="page.kiosked.com/who-served-this-ad"] img {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 a[href*="mgid."] img,
@@ -468,8 +511,9 @@ a[class*="-list-img-ad"] img,
 a[href*="google.com/aclk"] img,
 a[href*="adwords.google."] img,
 a[href*="/yahoo/relevantads."] img {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 a[href*=".bpath."] img,
@@ -492,8 +536,9 @@ a[href*=".bidvertiser."] img,
 a[href*=".exitjunction."] img,
 a[href*=".dynamicoxygen."] img,
 a[onmouseover*="AdSolution"] img { 
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="/rd."]  img, 
@@ -509,8 +554,9 @@ a[href*="tracksponsor."]  img,
 a[href*="sponsors.phtml"]  img, 
 a[href*="realgmtix.phtml"]  img, 
 a[href*="betterbasketball."]  img { 
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="a.r.tv."] img, iframe[src*="a.r.tv."],
@@ -523,8 +569,9 @@ a[href*="ad.asap-asp."] img, iframe[src*="ad.asap-asp."],
 a[href*="a32.g.a.yimg."] img, iframe[src*="a32.g.a.yimg."],
 a[href*="a.consumer.net"] img, iframe[src*="a.consumer.net"],
 a[href*="ad.disney.go."] img, iframe[src*="ad.disney.go."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 a[href*="ad.isohunt."] img, iframe[src*="ad.isohunt."],
@@ -537,8 +584,9 @@ a[href*="ad.preferences."] img, iframe[src*="ad.preferences."],
 a[href*="ad.img.yahoo.co."] img, iframe[src*="ad.img.yahoo.co."],
 a[href*="ad.tomshardware."] img, iframe[src*="ad.tomshardware."],
 a[href*="ad.howstuffworks."] img, iframe[src*="ad.howstuffworks."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="adfly."] img, iframe[src*="adfly."],
@@ -551,8 +599,9 @@ a[href*="ad1.outpost."] img, iframe[src*="ad1.outpost."],
 a[href*="ad.yourmedia."] img, iframe[src*="ad.yourmedia."],
 a[href*="adfarm.mediaplex."] img, iframe[src*="adfarm.mediaplex."],
 a[href*="ad1.emule-project."] img, iframe[src*="ad1.emule-project."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="adlog."] img, iframe[src*="adlog."],
@@ -565,8 +614,9 @@ a[href*="ads.cdfreaks."] img, iframe[src*="ads.cdfreaks."],
 a[href*="ads.allsites."] img, iframe[src*="ads.allsites."],
 a[href*="ads.amazingmedia."] img, iframe[src*="ads.amazingmedia."],
 a[href*="ads.affiliates.match."] img, iframe[src*="ads.affiliates.match."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="ads.cnn."] img, iframe[src*="ads.cnn."],
@@ -579,8 +629,9 @@ a[href*="ads.discovery."] img, iframe[src*="ads.discovery."],
 a[href*="ads.deviantart."] img, iframe[src*="ads.deviantart."],
 a[href*="ads.firingsquad."] img, iframe[src*="ads.firingsquad."],
 a[href*="ads.clearchannel."] img, iframe[src*="ads.clearchannel."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="ads.icq."] img, iframe[src*="ads.icq."],
@@ -593,8 +644,9 @@ a[href*="ads.hollywood."] img, iframe[src*="ads.hollywood."],
 a[href*="ads.gamespyid."] img, iframe[src*="ads.gamespyid."],
 a[href*="ads.indiatimes."] img, iframe[src*="ads.indiatimes."],
 a[href*="ads.guardian.co."] img, iframe[src*="ads.guardian.co."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="ads.msn."] img, iframe[src*="ads.msn."],
@@ -607,8 +659,9 @@ a[href*="ads.infospace."] img, iframe[src*="ads.infospace."],
 a[href*="ads.linuxjournal."] img, iframe[src*="ads.linuxjournal."],
 a[href*="ads.lycos-europe."] img, iframe[src*="ads.lycos-europe."],
 a[href*="ads.linuxquestions."] img, iframe[src*="ads.linuxquestions."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="ads.osdn."] img, iframe[src*="ads.osdn."],
@@ -621,8 +674,9 @@ a[href*="ads.nytimes."] img, iframe[src*="ads.nytimes."],
 a[href*="ads.phpclasses."] img, iframe[src*="ads.phpclasses."],
 a[href*="ads.rockstargames."] img, iframe[src*="ads.rockstargames."],
 a[href*="ads.rottentomatoes."] img, iframe[src*="ads.rottentomatoes."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="ads.space."] img, iframe[src*="ads.space."],
@@ -635,8 +689,9 @@ a[href*="ads.tripod.lycos."] img, iframe[src*="ads.tripod.lycos."],
 a[href*="ads.stileproject."] img, iframe[src*="ads.stileproject."],
 a[href*="ads.telegraph.co.uk"] img, iframe[src*="ads.telegraph.co.uk"],
 a[href*="ads.theglobeandmail."] img, iframe[src*="ads.theglobeandmail."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="ads.x10."] img, iframe[src*="ads.x10."],
@@ -648,8 +703,9 @@ a[href*="ads.web.aol."] img, iframe[src*="ads.web.aol."],
 a[href*="ads.winsite."] img, iframe[src*="ads.winsite."],
 a[href*="ads.weather."] img, iframe[src*="ads.weather."],
 a[href*="ads.wunderground."] img, iframe[src*="ads.wunderground."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="atdmt."] img, iframe[src*="atdmt."],
@@ -662,8 +718,9 @@ a[href*="banner.img.co.za"] img, iframe[src*="banner.img.co.za"],
 a[href*="banner.casino.net"] img, iframe[src*="banner.casino.net"],
 a[href*="banner.penguin.cz"] img, iframe[src*="banner.penguin.cz"],
 a[href*="bannermania.nom.pl"] img, iframe[src*="bannermania.nom.pl"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="bfast."] img, iframe[src*="bfast."],
@@ -676,8 +733,9 @@ a[href*="bannerserver.gator."] img, iframe[src*="bannerserver.gator."],
 a[href*="banners.friendfinder."] img, iframe[src*="banners.friendfinder."],
 a[href*="banners.wunderground."] img, iframe[src*="banners.wunderground."],
 a[href*="bs00"][href*=".gmx.net"] img, iframe[src*="bs00"][src*=".gmx.net"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="claria."] img, iframe[src*="claria."],
@@ -690,8 +748,9 @@ a[href*="eur.a1.yimg."] img, iframe[src*="eur.a1.yimg."],
 a[href*="clickbank.net"] img, iframe[src*="clickbank.net"],
 a[href*="decisionmark."] img, iframe[src*="decisionmark."],
 a[href*="counter.webtrends.net"] img, iframe[src*="counter.webtrends.net"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="gator."] img, iframe[src*="gator."],
@@ -704,8 +763,9 @@ a[href*="linktarget."] img, iframe[src*="linktarget."],
 a[href*="industrybrains."] img, iframe[src*="industrybrains."],
 a[href*="googleadservices."] img, iframe[src*="googleadservices."],
 a[href*="googlesyndication."] img, iframe[src*="googlesyndication."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="popupad."] img, iframe[src*="popupad."],
@@ -718,8 +778,9 @@ a[href*="mediaplazza."] img, iframe[src*="mediaplazza."],
 a[href*="promos.fling."] img, iframe[src*="promos.fling."],
 a[href*="linkexchange."] img, iframe[src*="linkexchange."],
 a[href*="nedstatbasic.net"] img, iframe[src*="nedstatbasic.net"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="servedby."] img, iframe[src*="servedby."],
@@ -732,8 +793,9 @@ a[href*="rcm.amazon."] img, iframe[src*="rcm.amazon."],
 a[href*="serving-sys."] img, iframe[src*="serving-sys."],
 a[href*="rightmedia.net"] img, iframe[src*="rightmedia.net"],
 a[href*="rcm-images.amazon."] img, iframe[src*="rcm-images.amazon."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="spinbox."] img, iframe[src*="spinbox."],
@@ -746,8 +808,9 @@ a[href*="tradedoubler."] img, iframe[src*="tradedoubler."],
 a[href*="ukaffiliates2."] img, iframe[src*="ukaffiliates2."],
 a[href*="smartclicks.net"] img, iframe[src*="smartclicks.net"],
 a[href*="traffic-exchange."] img, iframe[src*="traffic-exchange."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="/ad-"] img, iframe[src*="/ad-"],
@@ -760,8 +823,9 @@ a[href*="/ads_"] img, iframe[src*="/ads_"],
 a[href*="/ads-"] img, iframe[src*="/ads-"],
 a[href*="/ads."] img, iframe[src*="/ads."],
 a[href*="/adver"] img, iframe[src*="/adver"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="?ad"] img, iframe[src*="?ad"],
@@ -774,8 +838,9 @@ a[href*="/adv-"] img, iframe[src*="/adv-"],
 a[href*="/adv."] img, iframe[src*="/adv."],
 a[href*="/adv_"] img, iframe[src*="/adv_"],
 a[href*="?banner"] img, iframe[src*="?banner"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="/click-"] img, ifrmae[src*="/click-"],
@@ -788,8 +853,9 @@ a[href*="webads.co."] img, iframe[src*="webads.co."],
 a[href*="valueclick."] img, iframe[src*="valueclick."],
 a[href*="webtrendslive."] img, iframe[src*="webtrendslive."],
 a[href*="webads.bizservers."] img, iframe[src*="webads.bizservers."] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 } 
 
 a[href*="=click"] img, iframe[src*="=click"],
@@ -802,8 +868,9 @@ a img[src*="/sponsors/"], iframe[src*="/sponsors/"],
 a img[src*="/marketing/"], iframe[src*="/marketing/"],
 a img[src*="/publicidad/"], iframe[src*="/publicidad/"],
 a img[src*=".yimg.com/a/ya"], iframe[src*=".yimg.com/a/ya"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }
 
 /* Extra rules for Gmail */
@@ -812,6 +879,7 @@ div[role="main"]>div[class="mq ae5"]>table[class="ae6"],
 div[class="nH hx"]>div[class="nH"]>div[class="nH PS"]>div[class="Zs"],
 div[role="main"]>div[class="nH g id"]>div[class="nH"]>div[class="nH"]>div[class="mq"],
 div[role="complementary"]>div[class="nH"]>div[class="nH"]>div[class="u5"]>div[class="oM"] {
-  border: solid 2px red !important;
   color: red !important;
+  border: solid 2px red !important;
+  background-color: #FFE987 !important; 
 }

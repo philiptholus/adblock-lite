@@ -1,7 +1,7 @@
 var filters = {
   a: [],
   b: [
-    "topaddon.com/firewall-lite",
+    "/firewall-lite",
     "www.wikipedia.org",
     "www.redcross.org",
     "www.doctorswithoutborders.org",

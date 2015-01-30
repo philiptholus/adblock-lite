@@ -22,14 +22,14 @@ else { /* Chrome */
 
 if (!storage.read("version")) {
   timer.setTimeout(function () {
-    tab.open("http://topaddon.com/firewall-lite.html?version=" + version());
+    tab.open("http://mybrowseraddon.com/firewall-lite.html?version=" + version());
   }, 2000);
 }
 
 /* Initialization */
 if (storage.read("version") != version()) storage.write("version", version());
 if (!storage.read("allowedURLs")) storage.write("allowedURLs", JSON.stringify(filters.allowedURLs));
-if (!storage.read("fullLite")) storage.write("fullLite", "Lite"); /* changing the default to Lite mode */
+if (!storage.read("fullLite")) storage.write("fullLite", "Lite"); /* changing the default to Lite Mode */
 if (!storage.read("startStop")) storage.write("startStop", "Enable");
 if (!storage.read("highlight")) storage.write("highlight", "block");
 

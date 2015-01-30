@@ -112,60 +112,11 @@ var _chrome = {
     }
   },
 
-  webRequest: {
-    onBeforeRequest: function (callback, filter, opt_extraInfoSpec) {
-      chrome.webRequest.onBeforeRequest.addListener(function (details) {
-        callback(details);
-      }, filter, opt_extraInfoSpec);
-    }
-  },
-
-  context_menu: {
-    create: function (title, type, callback) {  //type: selection, page
-      chrome.contextMenus.create({
-        "title": title,
-        "contexts": [type],
-        "onclick": function () {
-          callback();
-        }
-      });
-    }
-  },
-
   icon: (function (state) {
     if (state == 'Disable') chrome.browserAction.setIcon({path:"../../data/icon16Disable.png"});
     else if (state == 'Lite') chrome.browserAction.setIcon({path:"../../data/icon16Lite.png"});
     else chrome.browserAction.setIcon({path:"../../data/icon16.png"});
   }),
-
-  notification: function (title, text) {
-    var notification = webkitNotifications.createNotification(
-      chrome.extension.getURL("./") + 'data/icon48.png',  title,  text
-    );
-    notification.show();
-    window.setTimeout(function () {
-      notification.cancel();
-    }, 5000);
-  },
-
-  play: (function () {
-    var audio = new Audio();
-    var canPlay = audio.canPlayType("audio/mpeg");
-    if (!canPlay) {
-      audio = document.createElement("iframe");
-      document.body.appendChild(audio);
-    }
-    return function (url) {
-      if (canPlay) {
-        audio.setAttribute("src", url);
-        audio.play();
-      }
-      else {
-        audio.removeAttribute('src');
-        audio.setAttribute('src', url);
-      }
-    }
-  })(),
 
   version: function () {
     return chrome[chrome.runtime && chrome.runtime.getManifest ? "runtime" : "extension"].getManifest().version;

@@ -34,6 +34,7 @@
 .top-ad ,
 .left-ad,
 .right-ad,
+.ad-label,
 .ads-bbll,
 .bottom-ad,
 .footer-ad,
@@ -68,6 +69,11 @@
 #ad-background,
 #adbarContainer,
 #RadAd_Skyscraper  {
+  display: none !important;
+  visibility: hidden !important;
+} 
+
+#ad-case  {
   display: none !important;
   visibility: hidden !important;
 } 
@@ -232,9 +238,17 @@ div[id*="ad-slot"] {
   visibility: hidden !important;
 }
 
+div[class*="AdBox"],
+div[data-xt-vimp*="duration_in_ms"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
 iframe[src*="padstm."],
 iframe[src*="clkrev."],
 iframe[src*="chitika."],
+iframe[id*="AdWrapper"],
+iframe[src*="cuelinks."],
 iframe[src*="srcopenx."],
 iframe[src*="mediaplex."],
 iframe[src*="cdn.betrad."],
@@ -434,6 +448,8 @@ a[href*="/adshows/"] img,
 a[href*="fastclick."] img,
 a[class*="AdChoices"] img,
 a[href*="ad-choices"] img,
+a[href*="shareasale."] img,
+a[href*="/advertising/"] em,
 a[href*="engine.fl-ads"] img,
 a[href*="ads_preference"] img,
 a[href*="/tag/sponsored"] img,

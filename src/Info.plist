@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Philip Tholus</string>
 	<key>Builder Version</key>
-	<string>10600.1.25.1</string>
+	<string>10600.2.5</string>
 	<key>CFBundleDisplayName</key>
 	<string>AdBlock Lite</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.2.1</string>
+	<string>0.2.2</string>
 	<key>CFBundleVersion</key>
 	<string>2</string>
 	<key>Chrome</key>
@@ -28,7 +28,7 @@
 				<key>Filename</key>
 				<string>data/popup/popup.html</string>
 				<key>Height</key>
-				<real>418</real>
+				<real>414</real>
 				<key>Identifier</key>
 				<string>popup</string>
 				<key>Width</key>
@@ -75,6 +75,6 @@
 	<key>Update Manifest URL</key>
 	<string>https://raw.githubusercontent.com/philiptholus/adblock-lite/master/src/update.plist</string>
 	<key>Website</key>
-	<string>http://topaddon.com/firewall-lite.html</string>
+	<string>http://mybrowseraddon.com/firewall-lite.html</string>
 </dict>
 </plist>
