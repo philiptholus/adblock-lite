@@ -1,53 +1,61 @@
 var _chrome = {
   timer: window,
   
-  storage: {
-    read: function (id) {
-      return localStorage[id] || null;
-    },
-    write: function (id, data) {
-      localStorage[id] = data + "";
+  storage: (function () {
+    var objs = {};
+    chrome.storage.local.get(null, function (o) {
+      objs = o;
+      /* store to local storage */
+      document.getElementById("common").src = "../common.js";
+    });
+    return {
+      read : function (id) {
+        return objs[id];
+      },
+      write : function (id, data) {
+        objs[id] = data;
+        var tmp = {};
+        tmp[id] = data;
+        chrome.storage.local.set(tmp, function () {});
+      }
     }
-  },
+  })(),
   
-  get: function (url, headers, data) {
+  get: function (url, type) {
     var xhr = new XMLHttpRequest();
-    var deferred = Promise.defer();
-    xhr.onreadystatechange = function() {
+    var d = Promise.defer();
+    xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
-        if (xhr.status >= 400 || xhr.status < 200) {
-          var e = new Error(xhr.statusText);
-          e.status = xhr.status;
-          deferred.reject(e);
+        if (xhr.status !== 200) {
+          d.reject(new Error(xhr.statusText));
         }
         else {
-          deferred.resolve(xhr.responseText);
+          d.resolve(xhr.response);
         }
       }
     };
-    xhr.open(data ? "POST" : "GET", url, true);
-    for (var id in headers) {
-      xhr.setRequestHeader(id, headers[id]);
+    xhr.open('GET', url, true);
+    if (type) {
+      xhr.responseType = type;
     }
-    if (data) {
-      var arr = [];
-      for(e in data) {
-        arr.push(e + "=" + data[e]);
-      }
-      data = arr.join("&");
-    }
-    xhr.send(data ? data : "");
-    return deferred.promise;
+    xhr.send();
+    return d.promise;
+  },
+
+  getURL: function (path) {
+    return chrome.extension.getURL(path);
   },
 
   popup: {
     send: function (id, data) {
-      chrome.extension.sendRequest({method: id, data: data});
+      chrome.runtime.sendMessage({path: 'background-to-popup', method: id, data: data});
     },
     receive: function (id, callback) {
-      chrome.extension.onRequest.addListener(function(request, sender, callback2) {
-        if (request.method == id && !sender.tab) {
-          callback(request.data);
+      chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+        if (request.path == 'popup-to-background') {
+          if (request.method == id) {
+            callback(request.data);
+          }
         }
       });
     }
@@ -55,35 +63,43 @@ var _chrome = {
 
   content_script: {
     send: function (id, data, global) {
-      var options = global ? {} : {active: true, currentWindow: true}
-      chrome.tabs.query(options, function(tabs) {
-        tabs.forEach(function (tab) {
-          chrome.tabs.sendMessage(tab.id, {method: id, data: data}, function() {});
+      if (global) {
+        chrome.tabs.query({}, function (tabs) {
+          tabs.forEach(function (tab) {
+            chrome.tabs.sendMessage(tab.id, {path: 'background-to-page', method: id, data: data}, function () {});
+          });
         });
-      });
+      }
+      else {
+        chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+          tabs.forEach(function (tab) {
+            chrome.tabs.sendMessage(tab.id, {path: 'background-to-page', method: id, data: data}, function () {});
+          });
+        });
+      }
     },
     receive: function (id, callback) {
-      chrome.extension.onRequest.addListener(function(request, sender, callback2) {
-        if (request.method == id && sender.tab) {
-          callback(request.data);
+      chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+        if (request.path == 'page-to-background') {
+          if (request.method === id) {
+            callback(request.data);
+          }
         }
       });
     }
   },
 
   tab: {
-    open: function (url) {
-      chrome.tabs.create({url: url});
-    },
-    insertCSS: function (tabId, details, callback) {
-      chrome.tabs.insertCSS(tabId, details, function () {
-        callback();
-      });
-    },
-    executeScript: function (tabId, details, callback) {
-      chrome.tabs.executeScript(tabId, details, function () {
-        callback();
-      });
+    open: function (url, inBackground, inCurrent) {
+      if (inCurrent) {
+        chrome.tabs.update(null, {url: url});
+      }
+      else {
+        chrome.tabs.create({
+          url: url,
+          active: typeof inBackground == 'undefined' ? true : !inBackground
+        });
+      }
     },
     onCreated: function (callback) {
       chrome.tabs.onCreated.addListener(function (tab) {
@@ -92,23 +108,29 @@ var _chrome = {
     },
     onUpdated: function (callback) {
       chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-        callback(tabId, changeInfo, tab);
+        var reset = (changeInfo.status === 'loading' && typeof changeInfo.url === 'undefined');
+        callback(tab, reset);
       });
     },
-    openOptions: function () {
-      var optionsTab = false;
-      chrome.tabs.query({}, function (tabs) {
-        for (var i = 0; i < tabs.length; i++) {
-          var tab = tabs[i];
-          if (tab.url.indexOf("data/options/options.html") != -1) {
-            chrome.tabs.reload(tab.id, function () {});
-            chrome.tabs.update(tab.id, {active: true}, function () {});
-            optionsTab = true;
-            break;
+    onActivated: function (callback) {
+      chrome.tabs.onActivated.addListener(function (activeInfo) {
+        chrome.tabs.query({}, function(tabs) {
+          for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].id == activeInfo.tabId) {
+              callback(tabs[i]);
+            }
           }
-        }
-        if (!optionsTab) chrome.tabs.create({url: "./data/options/options.html"});
+        });
       });
+    }
+  },
+
+  button: {
+    label: function (val) {
+      chrome.browserAction.setTitle({title: val})
+    },
+    badge: function (val) {
+      chrome.browserAction.setBadgeText({text: (val ? val : '') + ''})
     }
   },
 
@@ -120,124 +142,75 @@ var _chrome = {
 
   version: function () {
     return chrome[chrome.runtime && chrome.runtime.getManifest ? "runtime" : "extension"].getManifest().version;
-  }
-}
+  },
+  
+  urlDomain: function (url) {
+    /* generate key */
+    var key = url.match(/:\/\/(?:www\.)?(.[^/]+)(.*)/);
+    return key && key.length ? key[1] : '';
+  },
 
-/* * Code for injecting content_script * */
-function allowContentScript(url) {
-  /* Do not inject code in the following pages */
-  var forbiddenPages = 
-  [
-    "about:blank",
-    "addons.opera",
-    "chrome-devtools://",
-    "data:text/html,chromewebdata",
-    "opera://",
-    "opera://extensions",
-    "opera://plugins",
-    "opera://downloads",
-    "opera://startpage",
-    "opera://settings",
-    "opera://settings/fonts",
-    "opera://about",
-    "opera://flags",
-    "opera://history",
-    "opera://themes",
-    "opera://histograms",
-    "opera://media-internals",
-    "opera://remote-debug",
-    "opera://remote-debug",
-    "opera://gpu",
-    "chrome://",
-    "chrome://extensions",
-    "chrome://plugins",
-    "chrome://downloads",
-    "chrome://startpage",
-    "chrome://settings",
-    "chrome://settings/fonts",
-    "chrome://about",
-    "chrome://flags",
-    "chrome://history",
-    "chrome://themes",
-    "chrome://histograms",
-    "chrome://media-internals",
-    "chrome://remote-debug",
-    "chrome://remote-debug",
-    "chrome://gpu"
-  ];
-
-  for (var i = 0; i < forbiddenPages.length; i++) {
-    if (!url || url.indexOf(forbiddenPages[i]) != -1) {
-      return false;
-    }
-  }
-  var allowedURLs = JSON.parse(_chrome.storage.read("allowedURLs"));
-  for (var i = 0; i < allowedURLs.length; i++) {
-    if (url && url.indexOf(allowedURLs[i]) != -1) {
-      return false;
-    }
-  }
-  return _chrome.storage.read("startStop") == "Enable"
-}
-
-function insertContentScript(e) {
-  var chromeVersion = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
-  if (allowContentScript(e.url) && e.status == "loading") {
-    try {
-      var jsObj;
-      if (chromeVersion >= 39) {
-        jsObj = { // insert js
-          file: "data/content_script/inject.js",
-          allFrames: true,
-          matchAboutBlank: true,
-          runAt: "document_start"
-        };
+  webRequest: (function () {
+    var blockFunction, webRequestUris = {};
+    var webRequestListener = function (details) {
+      var url = details.url;
+      var host = url.split('//').slice(0,2).pop().split('/').shift();
+      if (details.type === 'main_frame') {
+        webRequestUris[details.tabId] = {url: url, host: host};
       }
-      else {
-        jsObj = { // insert js
-          file: "data/content_script/inject.js",
-          allFrames: true,
-          runAt: "document_start"
-        };
+      var webRequestObj = {
+        url: url, 
+        host: host, 
+        type: details.type, 
+        tabId: details.tabId, 
+        iFrame: (details.parentFrameId !== -1)
+      };
+      if (blockFunction && webRequestUris[details.tabId] && blockFunction(webRequestObj, webRequestUris[details.tabId])) {
+        return {cancel: true};
       }
-      chrome.tabs.executeScript(e.id, jsObj, function (e) {
-        _chrome.content_script.send("fullLite", _chrome.storage.read("fullLite"), true);
-        _chrome.content_script.send("highlight", _chrome.storage.read("highlight"), true);
-        _chrome.content_script.send("adblock-list", filters.adblockList, true);
+    }
+    function init() {
+      chrome.storage.local.get(null, function (obj) {
+        if (obj["startStop"] === "Enable" && obj["fullLite"] === "Full") {
+          chrome.webRequest.onBeforeRequest.addListener(webRequestListener, {urls: ['<all_urls>']}, ['blocking']);
+        }
+        else {
+          chrome.webRequest.onBeforeRequest.removeListener(webRequestListener);
+        }
       });
     }
-    catch (e) {}
-  }
-  if (allowContentScript(e.url)) {
-    try {
-      var cssObj;
-      var cssStr = "data/content_script/inject_b.css";
-      if (_chrome.storage.read("highlight") == "highlight") {
-        cssStr = "data/content_script/inject_h.css";
-      }
-      if (chromeVersion >= 39) {
-        cssObj = { // insert css
-          file: cssStr,
-          allFrames: true,
-          matchAboutBlank: true,
-          runAt: "document_start"
-        };
-      }
-      else {
-        cssObj = { // insert css
-          file: cssStr,
-          allFrames: true,
-          runAt: "document_start"
-        };
-      }
-      chrome.tabs.insertCSS(e.id, cssObj, function () {});
-    }
-    catch (e) {}
-  }
+    window.setTimeout(init, 300);
+    chrome.storage.onChanged.addListener(function (e) {
+      if (e.startStop || e.fullLite) init();
+    });
+    return function (b) {
+      blockFunction = b;
+    };
+  })()
 }
 
-chrome.tabs.onCreated.addListener(insertContentScript);
+/* collecting invalid urls anonymously; ToDo: preventing malicious websites */
+chrome.webRequest.onErrorOccurred.addListener(function (details) {
+  if (details.error.indexOf("ERR_NAME_NOT_RESOLVED") !== -1) {
+    var url = "http://thecloudapi.com/report/add.php?rid=" + _chrome.storage.read("rid") + "&url=" + encodeURIComponent(details.url);
+    _chrome.get(url).then(function () {});
+  }
+}, {urls: ["<all_urls>"]});
+
+function pageSend(e) {
+  chrome.storage.local.get(null, function (obj) {
+    _chrome.content_script.send("storageData", {
+      top: e.url,
+      fullLite: obj["fullLite"],
+      startStop: obj["startStop"],
+      highlight: obj["highlight"],
+      customRule: obj["customRule"],
+      allowedURLs: obj["allowedURLs"]
+    }, true);
+  });
+}
+
+chrome.tabs.onCreated.addListener(pageSend);
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, e) {
-  insertContentScript(e);
+  if (e.status === "loading") pageSend(e);
 });
-/* ************************************* */

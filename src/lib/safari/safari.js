@@ -1,46 +1,50 @@
 var _safari = {
+  timer: window,
+
+  storageListener: {
+    data: '',
+    onChange: (function () {
+      return function (b) {
+        this.data = b;
+      }
+    })()
+  },
+
   storage: {
     read: function (id) {
       return localStorage[id] || null;
     },
     write: function (id, data) {
-      localStorage[id] = data + "";
-      if (id === "fullLite" || id === "startStop" || id === "allowedURLs") {
-        insertContentScript();
-      }
+      localStorage[id] = data + '';
+      _safari.storageListener.data(id);
     }
   },
 
-  timer: window,
-
-  get: function (url, headers, data) {
+  get: function (url, type) {
     var xhr = new XMLHttpRequest();
     var deferred = new task.Deferred();
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
-        if (xhr.status >= 400) {
+        if (xhr.status !== 0 && xhr.status !== 200) {
           var e = new Error(xhr.statusText);
           e.status = xhr.status;
           deferred.reject(e);
         }
         else {
-          deferred.resolve(xhr.responseText);
+          deferred.resolve(xhr.response);
         }
       }
     };
-    xhr.open(data ? "POST" : "GET", url, true);
-    for (var id in headers) {
-      xhr.setRequestHeader(id, headers[id]);
+    xhr.open("GET", url, true);
+    if (type) {
+      xhr.responseType = type;
     }
-    if (data) {
-      var arr = [];
-      for(e in data) {
-        arr.push(e + "=" + data[e]);
-      }
-      data = arr.join("&");
-    }
-    xhr.send(data ? data : "");
+    xhr.send();
     return deferred.promise;
+  },
+
+  getURL: function (path) {
+    return safari.extension.baseURI + path;
   },
 
   popup: (function () {
@@ -64,46 +68,50 @@ var _safari = {
     open: function (url) {
       safari.application.activeBrowserWindow.openTab().url = url;
     },
-    openOptions: function () {
-      safari.application.activeBrowserWindow.openTab().url = safari.extension.baseURI + "data/options/options.html";
+    onCreated: function (callback) {
+      safari.application.addEventListener("open", function (e) {
+        callback(e.target);
+      }, true);
+    },
+    onUpdated: function (callback) {
+      safari.application.addEventListener("beforeNavigate", function (e) {
+        callback(e.target, true);
+      }, true);
+    },
+    onActivated: function (callback) {
+      safari.application.addEventListener("activate", function (e) {
+        callback(e.target.activeTab || e.target);
+      }, true);
     }
   },
 
-  notification: function (title, text) {
-    alert(text);
+  button: {
+    label: function (val) {
+      safari.extension.toolbarItems[0].toolTip = val;
+    },
+    badge: function (val) {
+      safari.extension.toolbarItems[0].badge = (val ? val : '') + '';
+    }
   },
-
-  play: (function () {
-    var canPlay = false;
-    try {
-      var audio = new Audio();
-      canPlay = audio.canPlayType("audio/mpeg");
-    } catch (e) {}
-    if (!canPlay) {
-      audio = document.createElement("iframe");
-      document.body.appendChild(audio);
-    }
-    return function (url) {
-      if (canPlay) {
-        audio.setAttribute("src", url);
-        audio.play();
-      }
-      else {
-        audio.removeAttribute('src');
-        audio.setAttribute('src', url);
-      }
-    }
-  })(),
 
   version: function () {
     return safari.extension.displayVersion;
   },
 
+  urlDomain: function (url) {
+    /* generate key */
+    if (url) {
+      var key = url.match(/:\/\/(?:www\.)?(.[^/]+)(.*)/);
+      return key && key.length ? key[1] : '';
+    }
+    return '';
+  },
+
   icon: function (state) {
-    if (state == 'Disable') {
+    if (state === 'Disable') {
       safari.extension.toolbarItems[0].image = safari.extension.baseURI + 'data/icon16Disable-mac.png';
     }
-    else if (state == 'Lite') {
+    else if (state === 'Lite') {
       safari.extension.toolbarItems[0].image = safari.extension.baseURI + 'data/icon16Lite-mac.png';
     }
     else {
@@ -137,92 +145,63 @@ var _safari = {
     }
   })(),
 
-  context_menu: (function () {
-    var onPage = [];
-    var onSelection = [];
-    safari.application.addEventListener("contextmenu", function (e) {
-      var selected = e.userInfo && "selectedText" in e.userInfo && e.userInfo.selectedText;
-      onPage.forEach(function (arr, i) {
-        e.contextMenu.appendContextMenuItem("igtranslator.onPage:" + i, arr[0]);
-      });
-      if (selected) {
-        onSelection.forEach(function (arr, i) {
-          e.contextMenu.appendContextMenuItem("igtranslator.onSelection:" + i, arr[0]);
+  webRequest: (function() {
+    var blockFunction, webRequestUris = {}, webRequestPermission;
+    var getTabId = (function () {
+      var tabs = [];
+      return function (tab) {
+        var tabId = tabs.indexOf(tab);
+        if (tabId === -1) {
+          return tabs.push(tab) - 1;
+        }
+        return tabId;
+      }
+    })();
+    var webRequestListener = function(e) {
+      if (e.name === "canLoad") {
+        if (e.stopPropagation) e.stopPropagation();
+        var tabId = getTabId(e.target);
+        var top = e.message.top || '';
+        var url = e.message.url || '';
+        webRequestUris[tabId] = {
+          url: top,
+          host: top.split('//').slice(0,2).pop().split('/').shift() || ''
+        };
+        var webRequestObj = {
+          url: url,
+          host: url.split('//').slice(0,2).pop().split('/').shift() || '',
+          type: e.message.type,
+          tabId: tabId,
+          iFrame: e.message.iFrame
+        };
+        if (webRequestPermission === "addWebRequestListener") {
+          if (blockFunction && webRequestUris[tabId] && blockFunction(webRequestObj, webRequestUris[tabId])) {
+            e.message = {method: "block", url: url, index: e.message.index || 0};
+          }
+          else {
+            e.message = {method: "allow", url: url, index: e.message.index || 0};
+          }
+        }
+        else {
+          e.message = {method: "allow", url: url, index: e.message.index || 0};
+        }
+        function init() {
+          if (localStorage["startStop"] === "Enable" && localStorage["fullLite"] === "Full") {
+            webRequestPermission = "addWebRequestListener";
+          }
+          else {
+            webRequestPermission = "removeWebRequestListener";
+          }
+        }
+        window.setTimeout(init, 300);
+        _safari.storageListener.onChange(function (s) {
+          if (s === "stortStop" || s === "fullLite") init();
         });
       }
-    }, false);
-    safari.application.addEventListener("command", function (e) {
-      var cmd = e.command;
-      if (cmd.indexOf("igtranslator.onPage:") != -1) {
-        var i = parseInt(cmd.substr(20));
-        onPage[i][1]();
-      }
-      if (cmd.indexOf("igtranslator.onSelection:") != -1) {
-        var i = parseInt(cmd.substr(25));
-        onSelection[i][1]();
-      }
-    }, false);
-    return {
-      create: function (title, type, callback) {
-        if (type == "page") {
-          onPage.push([title, callback]);
-        }
-        if (type == "selection") {
-          onSelection.push([title, callback]);
-        }
-      }
     }
+    safari.application.addEventListener("message", webRequestListener, true);
+    return function (b) {
+      blockFunction = b;
+    };
   })()
 }
-
-/* * Code for injecting content_script * */
-function insertContentScript() {
-  safari.extension.removeContentScripts();
-  safari.extension.removeContentStyleSheets();
-  if (localStorage["startStop"] == "Enable") {
-    var contentScript = {
-      loc: safari.extension.baseURI + 'data/content_script/inject.js'
-    };
-    safari.extension.addContentScriptFromURL(contentScript.loc, contentScript.whitelist, contentScript.blacklist, false);
-  }
-}
-if (localStorage["allowedURLs"]) {
-  insertContentScript();
-}
-
-function handler(event) {
-  var url = event.message;
-  if (localStorage["startStop"] == "Enable") {
-    if (event.name === "canLoad") {
-      var topLevelUrl = event.target.url;
-      if (url != topLevelUrl) { // top url is allowed
-        var allowedURLs = JSON.parse(localStorage["allowedURLs"]);
-        for (var i = 0; i < allowedURLs.length; i++) {
-          if (topLevelUrl && topLevelUrl.indexOf(allowedURLs[i]) != -1) {
-            return false;
-          }
-        }
-        /*
-        for (var j = 0; j < filters.blockedURLs.length; j++) {
-          var flag = (new RegExp('\\b' + filters.blockedURLs[j] + '\\b')).test(url);
-          if (flag) {
-            // console.error("onBeforeLoad Safari: ", filters.blockedURLs[j]);
-            event.message = "block";
-            return;
-          }
-        }
-        */
-        event.message = {
-          name: "injectCss",
-          text: localStorage["highlight"],
-          fullLite: localStorage["fullLite"]
-        };
-      }
-      _safari.content_script.send("script-list", filters.scriptList, true);
-      _safari.content_script.send("allowed-urls", filters.allowedURLs, true);
-      _safari.content_script.send("adblock-list", filters.adblockList, true);
-    }
-  }
-}
-safari.application.addEventListener("message", handler, true);
-/* ************************************* */

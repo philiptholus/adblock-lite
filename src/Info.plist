@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Philip Tholus</string>
 	<key>Builder Version</key>
-	<string>10600.2.5</string>
+	<string>10600.6.3</string>
 	<key>CFBundleDisplayName</key>
 	<string>AdBlock Lite</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.2.2</string>
+	<string>0.2.5</string>
 	<key>CFBundleVersion</key>
 	<string>2</string>
 	<key>Chrome</key>
@@ -54,7 +54,12 @@
 	<key>Content</key>
 	<dict>
 		<key>Scripts</key>
-		<dict/>
+		<dict>
+			<key>Start</key>
+			<array>
+				<string>data/content_script/inject.js</string>
+			</array>
+		</dict>
 	</dict>
 	<key>Description</key>
 	<string>Block ads seamlessly on popular websites</string>

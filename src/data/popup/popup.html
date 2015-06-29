@@ -31,16 +31,17 @@
     <table>
       <tbody>
         <tr>
+          <td id="input-field-toggle" title="Swap between 'Exception Table' and 'Custom-Rule Table'. To add a custom rule, please use css-selectors. For example, the following rule hides a 'div' element with class 'test': div[class='test']. Please note, you can only add valid css rules, otherwise it won't be added to the list."></td>
           <td id="input-field-td">
             <input id="input-field" placeholder="Enter a website to exclude" title="Enter a portion of the desired website to exclude it from blocking. For instance, if you would like to allow advertising on https://mail.google.com, simply enter mail.google.com and press Enter or (+) button.">
             </input>
           </td>
-          <td id="input-field-add"></td>
+          <td id="input-field-add" title="Add Item to the Table"></td>
         </tr>
       </tbody>
     </table>
     <div id="website-list">
-      <table id="website-list-table"></table>
+      <table id="website-list-table" type="add"></table>
     </div>
     <table>
       <tbody>

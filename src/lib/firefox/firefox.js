@@ -1,78 +1,60 @@
-// Load Firefox based resources
-var self          = require("sdk/self"),
-    data          = self.data,
-    events        = require("sdk/system/events"),
-    unload        = require("sdk/system/unload"),
-    sp            = require("sdk/simple-prefs"),
-    Request       = require("sdk/request").Request,
-    prefs         = sp.prefs,
-    timers        = require("sdk/timers"),
-    buttons       = require('sdk/ui/button/action'),
-    pageMod       = require("sdk/page-mod"),
-    pageWorker    = require("sdk/page-worker"),
-    tabs          = require("sdk/tabs"),
-    windowUtils   = require('sdk/window/utils'),
-    contextMenu   = require("sdk/context-menu"),
-    array         = require('sdk/util/array'),
-    filter        = require('../filter'),
-    {Cc, Ci, Cu, Cr}  = require('chrome'),
-    windows       = {
-      get active () { // Chrome window
-        return windowUtils.getMostRecentBrowserWindow()
-      }
-    };
-    
+var self             = require("sdk/self"),
+    { Cc, Ci, Cu, Cr } = require('chrome'),
+    tabs             = require("sdk/tabs"),
+    tbExtra          = require("./tbExtra"),
+    config           = require("../config"),
+    timers           = require("sdk/timers"),
+    pageMod          = require("sdk/page-mod"),
+    array            = require('sdk/util/array'),
+    utils            = require('sdk/tabs/utils'),
+    loader           = require('@loader/options'),
+    prefsListener    = require("sdk/simple-prefs"),
+    unload           = require("sdk/system/unload"),
+    buttons          = require('sdk/ui/button/action'),
+    data             = self.data;
+
 Cu.import("resource://gre/modules/Promise.jsm");
 
-var filters = filter.filters;
 exports.timer = timers;
+var prefs = prefsListener.prefs;
+function pageModOnAttach () {};
 
-/* * Code for injecting content_script * */
 var workers = [], content_script_arr = [];
-function insertContentScript() {
-  return pageMod.PageMod({
-    include: ["*"],
-    contentScriptFile: [data.url("content_script/inject.js")],
-    contentScriptWhen: "start",
-    contentScriptOptions: {
-      manifest: self,
-      fullLite: prefs.fullLite, 
-      highlight: prefs.highlight,
-      allowedURLs: JSON.parse(prefs.allowedURLs),
-    },
-    onAttach: function(worker) {
-      worker.port.emit("topLevelUrl", worker.tab.url);
-      worker.port.emit("adblock-list", filters.adblockList);
-      array.add(workers, worker);
-      worker.on('pageshow', function() { array.add(workers, this); });
-      worker.on('pagehide', function() { array.remove(workers, this); });
-      worker.on('detach', function() { array.remove(workers, this); });
-      content_script_arr.forEach(function (arr) {
-        worker.port.on(arr[0], arr[1]);
-      });
+pageMod.PageMod({
+  include: ["http://*", "https://*"],
+  contentScriptFile: [data.url("content_script/inject.js")],
+  attachTo: ["existing", "top", "frame"],
+  contentScriptWhen: "start",
+  contentScriptOptions: {
+    base: loader.prefixURI + loader.name + "/"
+  },
+  onAttach: function(worker) {
+    worker.port.emit("storageData", {
+      top: worker.tab.url,
+      fullLite: prefs["fullLite"],
+      startStop: prefs["startStop"],
+      highlight: prefs["highlight"],
+      customRule: prefs["customRule"],
+      allowedURLs: prefs["allowedURLs"]
+    });
+    if (worker.tab.url == worker.url) {
+      if (worker.tab.readyState === "loading") {
+        pageModOnAttach({url: worker.url}, true);
+      }
     }
-  });
-}
-var myPageMode;
-function reRunPageMode() {
-  var startStop = prefs.startStop;
-  if (myPageMode) myPageMode.destroy();
-  if (startStop == "Enable") {
-    myPageMode = insertContentScript();
+    array.add(workers, worker);
+    worker.on('pageshow', function() { array.add(workers, this); });
+    worker.on('pagehide', function() { array.remove(workers, this); });
+    worker.on('detach', function() { array.remove(workers, this); });
+    content_script_arr.forEach(function (arr) {
+      worker.port.on(arr[0], arr[1]);
+    });
   }
-}
-sp.on("fullLite", reRunPageMode);
-sp.on("startStop", reRunPageMode);
-sp.on("highlight", reRunPageMode);
-sp.on("allowedURLs", reRunPageMode);
-
-if (prefs.startStop == "Enable" && prefs.allowedURLs) {
-  myPageMode = insertContentScript();
-}
+});
 
 var popup = require("sdk/panel").Panel({
-  width: 450,
-  height: 418,
+  width: 452,
+  height: 414,
   contentURL: data.url("./popup/popup.html"),
   contentScriptFile: [data.url("./popup/popup.js")]
 });
@@ -80,7 +62,7 @@ popup.on('show', function() {
   popup.port.emit('show', true);
 });
 popup.port.on("resize", function(obj) {
-  popup.resize(obj.w, obj.h + 3);
+  popup.resize(obj.w, obj.h);
 });
 
 var button = buttons.ActionButton({
@@ -97,43 +79,63 @@ var button = buttons.ActionButton({
     });
   }
 });
+tbExtra.setButton(button);
 
-exports.storage = {
-  read: function (id) {
-    return (prefs[id] || prefs[id] + "" == "false") ? (prefs[id] + "") : null;
+exports.button = {
+  onCommand: function (c) {
+    onClick = c;
   },
-  write: function (id, data) {
-    data = data + "";
-    if (data === "true" || data === "false") {
-      prefs[id] = data === "true" ? true : false;
-    }
-    else if (parseInt(data) + "" === data) {
-      prefs[id] = parseInt(data);
-    }
-    else {
-      prefs[id] = data + "";
+  label:  function (val) {
+    button.label = val;
+  },
+  badge: function (val) {
+    if (config.ui.badge) {
+      tbExtra.setBadge(val ? val : '');
     }
   }
 }
 
-exports.get = function (url, headers, data) {
+exports.storage = {
+  read: function (id) {
+    return (prefs[id] || prefs[id] + '' === 'false' || !isNaN(prefs[id])) ? (prefs[id] + '') : null;
+  },
+  write: function (id, data) {
+    data = data + '';
+    if (data === 'true' || data === 'false') {
+      prefs[id] = data === 'true' ? true : false;
+    }
+    else if (parseInt(data) + '' === data) {
+      prefs[id] = parseInt(data);
+    }
+    else {
+      prefs[id] = data + '';
+    }
+  }
+}
+
+exports.get = function (url, type) {
   var d = new Promise.defer();
-  Request({
-    url: url,
-    headers: headers || {},
-    content: data,
-    onComplete: function (response) {
-      if (response.status >= 400 || response.status < 200) {
-        var e = new Error(response.status);
-        e.status = response.status;
-        d.reject(e);
-      } 
-      else {
-        d.resolve(response.text);
+  var xhr = Cc['@mozilla.org/xmlextras/xmlhttprequest;1'].createInstance(Ci.nsIXMLHttpRequest);
+  if (type) {
+    xhr.responseType = type;
+  }
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status !== 200) {
+        d.reject("xmlHttpRequest error");
       }
-    }  
-  })[data ? "post" : "get"]();
+      else {
+        d.resolve(type ? xhr.response : xhr.responseText);
+      }
+    }
+  };
+  xhr.open('GET', url, true);
+  xhr.send();
   return d.promise;
+}
+
+exports.getURL = function (path) {
+  return loader.prefixURI + loader.name + '/' + path;
 }
 
 exports.popup = {
@@ -170,17 +172,20 @@ exports.tab = {
       });
     }
   },
-  openOptions: function () {
-    var optionsTab = false;
-    for each (var tab in tabs) {
-      if (tab.url.indexOf("dwtFBkQjb3SIQp-at-jetpack/adblock-lite") != -1) {
-        tab.reload();            // reload the options tab
-        tab.activate();          // activate the options tab
-        tab.window.activate();   // activate the options tab window
-        optionsTab = true;
+  onCreated: function (callback) {
+    tabs.on("open", function onOpen(tab) {
+     callback(tab);
+    });
+  },
+  onUpdated: function (callback) {
+    pageModOnAttach = callback;
+  },
+  onActivated: function (callback) {
+    tabs.on("activate", function (tab) {
+      if (tab) {
+        callback(tab);
       }
-    }
-    if (!optionsTab) tabs.open(data.url("options/options.html"));
+    });
   }
 }
 
@@ -197,7 +202,96 @@ exports.icon = function (type) {
   button.icon = icon;
 }
 
-exports.Promise = Promise;
-exports.Deferred = Promise.defer;
-exports.window = windowUtils.getMostRecentBrowserWindow();
-sp.on("settings", exports.tab.openOptions);
+exports.urlDomain = function (url) {
+  /* generate key */
+  var key = url.match(/:\/\/(?:www\.)?(.[^/]+)(.*)/);
+  return key && key.length ? key[1] : '';
+}
+
+exports.webRequest = (function () {
+  var blockFunction, registered = false;
+  var observerService = Cc['@mozilla.org/observer-service;1'].getService(Ci.nsIObserverService);
+  var httpRequestObserver = {
+    observe: function (subject, topic, data) {
+      var httpChannel = subject.QueryInterface(Ci.nsIHttpChannel);
+      if (!httpChannel.notificationCallbacks) return;
+      var interfaceRequestor = httpChannel.notificationCallbacks.QueryInterface(Ci.nsIInterfaceRequestor);
+      var loadContext;
+      try {
+        loadContext = interfaceRequestor.getInterface(Ci.nsILoadContext);
+      }
+      catch (e) {
+        try {
+          loadContext = subject.loadGroup.notificationCallbacks.getInterface(Ci.nsILoadContext);
+        }
+        catch (e) {
+          loadContext = null;
+        }
+      }
+      if (loadContext) {
+        try {
+          var contentWindow = loadContext.associatedWindow;
+          if (contentWindow) {
+            var tab = utils.getTabForContentWindow(contentWindow.top);
+            if (tab) {
+              var tabId = utils.getTabId(tab);
+              if (tabId) {
+                var typeMap = {
+                  1: 'other',
+                  2: 'script',
+                  3: 'image',
+                  4: 'stylesheet',
+                  5: 'object',
+                  6: 'main_frame',
+                  7: 'sub_frame',
+                  10: 'ping',
+                  11: 'xmlhttprequest',
+                  12: 'object',
+                  14: 'font',
+                  15: 'media',
+                  16: 'websocket',
+                  19: 'beacon',
+                  21: 'image'
+                };
+                var rawtype = httpChannel.loadInfo && httpChannel.loadInfo.contentPolicyType || 1;
+                var webRequestObj = {
+                  url: httpChannel.URI.spec, 
+                  host: httpChannel.URI.host, 
+                  type: typeMap[rawtype],
+                  tabId: tabId, 
+                  iFrame: (typeMap[rawtype] === "sub_frame")
+                };
+                var top = contentWindow.top.document.location;
+                if (blockFunction && blockFunction(webRequestObj, {url: top.href, host: top.host})) {
+                  subject.cancel(Cr.NS_BINDING_ABORTED);
+                }
+              }
+            }
+          }
+        }
+        catch (e) {}
+      }
+    }
+  }
+  function init(flag) {
+    if (prefs["startStop"] === "Enable" && prefs["fullLite"] === "Full" && !flag) {
+      registered = true;
+      observerService.addObserver(httpRequestObserver, 'http-on-modify-request', false);
+    }
+    else {
+      if (registered) {
+        observerService.removeObserver(httpRequestObserver, 'http-on-modify-request');
+      }
+      registered = false;
+    }
+  }
+  timers.setTimeout(init, 300);
+  unload.when(function () {
+    init(true);
+  });
+  prefsListener.on("startStop", function () {init()});
+  prefsListener.on("fullLite", function () {init()});
+  return function (b) {
+    blockFunction = b;
+  };
+})();

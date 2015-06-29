@@ -2,7 +2,7 @@ body {
   border: 0;
   margin: 0;
   padding: 0;
-  width: 450px;
+  width: 452px;
   height: 414px;
   overflow: hidden;
   font-size: 16px;
@@ -17,9 +17,9 @@ table {
   width: 100%;
 }
 body>* {
-  margin: 3px;
+  margin: 3px 0;
   border: solid 1px #DDDDDD;
-  width: calc(100% - 6px);
+  width: calc(100% - 0);
 }
 
 tr td {
@@ -40,7 +40,7 @@ tr td[type='number'] {
   font-size: 12px;
   text-align: center;
 }
-tr td[type='url'] {
+tr td[type='item'] {
   display: block;
   font-size: 12px;
   white-space: nowrap;
@@ -53,7 +53,7 @@ tr td[type='close']{
   width: 30px;
 }
 tr td[type='close']:hover {
-  background: url('close-white.png') no-repeat center center;
+  background: #C75050 url('close-white.png') no-repeat center center;
 }
 input {
   width: 100%;
@@ -78,7 +78,7 @@ span {
   height: 65px;
   min-height: 65px;
   max-height: 65px;
-  background-color: #EEEEEE;
+  background-color: #D3D3D3;
 }
 #website-list {
   display: block;
@@ -105,10 +105,11 @@ span {
   line-height: 30px;
   text-align: center;
   vertical-align: middle;
+  text-transform: uppercase;
   background-color: #4285F4;
   -webkit-transition: 300ms background-color;
   -moz-transition: 300ms background-color;
-  box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 -1px 0 rgba(0, 0, 0, 0.15) inset;
+  box-shadow: 0 0px 5px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.1), 0 15px 0 rgba(255, 255, 255, 0.25) inset, 0 0 0 rgba(0, 0, 0, 0.15) inset;
   cursor: pointer;
 }
 #highlight-ads-button:hover,
@@ -158,7 +159,7 @@ span {
 #full-lite-button-td-info {
   font-size: 11px;
   text-align: center;
-  background-color: #D3D3D3;
+  background: #D3D3D3;
 }
 #input-field {
   height: 30px;
@@ -166,6 +167,15 @@ span {
   margin: 0;
   padding: 0;
   text-indent: 10px;
+}
+#input-field-toggle {
+  width: 30px;
+  height: 30px;
+  background: #4285F4 url('toggle.png') no-repeat center center;
+  cursor: pointer;
+}
+#input-field-toggle:hover {
+  background: #5291f2 url('toggle.png') no-repeat center center;
 }
 #input-field-add {
   width: 30px;
