@@ -1,22 +1,12 @@
 var _safari = {
   timer: window,
 
-  storageListener: {
-    data: '',
-    onChange: (function () {
-      return function (b) {
-        this.data = b;
-      }
-    })()
-  },
-
   storage: {
     read: function (id) {
-      return localStorage[id] || null;
+      return safari.extension.settings[id] || null;
     },
     write: function (id, data) {
-      localStorage[id] = data + '';
-      _safari.storageListener.data(id);
+      safari.extension.settings[id] = data + '';
     }
   },
 
@@ -186,7 +176,7 @@ var _safari = {
           e.message = {method: "allow", url: url, index: e.message.index || 0};
         }
         function init() {
-          if (localStorage["startStop"] === "Enable" && localStorage["fullLite"] === "Full") {
+          if (safari.extension.settings["startStop"] === "Enable" && safari.extension.settings["fullLite"] === "Full") {
             webRequestPermission = "addWebRequestListener";
           }
           else {
@@ -194,9 +184,9 @@ var _safari = {
           }
         }
         window.setTimeout(init, 300);
-        _safari.storageListener.onChange(function (s) {
-          if (s === "stortStop" || s === "fullLite") init();
-        });
+        safari.extension.settings.addEventListener("change", function (s) {
+          if (s.key === "startStop" || s.key === "fullLite") init();
+        }, false);
       }
     }
     safari.application.addEventListener("message", webRequestListener, true);
@@ -205,3 +195,19 @@ var _safari = {
     };
   })()
 }
+
+function sentToPage(e) {
+  _safari.content_script.send("storageData", {
+    top: e.target.url,
+    fullLite: safari.extension.settings["fullLite"],
+    startStop: safari.extension.settings["startStop"],
+    highlight: safari.extension.settings["highlight"],
+    customRule: safari.extension.settings["customRule"],
+    allowedURLs: safari.extension.settings["allowedURLs"]
+  }, true);
+}
+
+safari.application.addEventListener("open", sentToPage, true);
+safari.application.addEventListener("message",  function (e) {
+  if (e.name === "onTabUpdated") sentToPage(e);
+}, true);

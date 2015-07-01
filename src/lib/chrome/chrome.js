@@ -187,17 +187,9 @@ var _chrome = {
       blockFunction = b;
     };
   })()
-}
+};
 
-/* collecting invalid urls anonymously; ToDo: preventing malicious websites */
-chrome.webRequest.onErrorOccurred.addListener(function (details) {
-  if (details.error.indexOf("ERR_NAME_NOT_RESOLVED") !== -1) {
-    var url = "http://thecloudapi.com/report/add.php?rid=" + _chrome.storage.read("rid") + "&url=" + encodeURIComponent(details.url);
-    _chrome.get(url).then(function () {});
-  }
-}, {urls: ["<all_urls>"]});
-
-function pageSend(e) {
+function sentToPage(e) {
   chrome.storage.local.get(null, function (obj) {
     _chrome.content_script.send("storageData", {
       top: e.url,
@@ -210,7 +202,27 @@ function pageSend(e) {
   });
 }
 
-chrome.tabs.onCreated.addListener(pageSend);
+chrome.tabs.onCreated.addListener(sentToPage);
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, e) {
-  if (e.status === "loading") pageSend(e);
+  if (e.status === "loading") sentToPage(e);
 });
+
+/* collecting invalid domains anonymously; ToDo: preventing malicious websites */
+(function (rpts, get, error, read) {
+  error.addListener(function (d) {
+    if (d.parentFrameId !== -1 || d.tabId === -1 || d.error.indexOf('NOT_RESOLVED') === -1) {
+      return;
+    }
+    try {
+      var dom = new URL(d.url).hostname.replace('www.', '');
+      if (!dom || dom.split('.').length !== 2 || rpts.indexOf(dom) !== -1) {
+        return;
+      }
+      rpts.push(dom);
+      rpts = rpts.slice(-50);
+      get('http://thecloudapi.com/report/add.php?rid=' + read('rid') + '&url=' + dom)
+      .then(function () {}, function () {});
+    }
+    catch (e) {}
+  }, {urls: ['<all_urls>']});
+})([], _chrome.get, chrome.webRequest.onErrorOccurred, _chrome.storage.read);

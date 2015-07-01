@@ -31,7 +31,10 @@ else if (typeof safari !== 'undefined') { /* Safari */
   })();
   manifest.url = safari.extension.baseURI;
   /* handle all request types except ajax */
+  var onTabUpdated = false;
   window.addEventListener("beforeload", function (e) {
+    if (!onTabUpdated) safari.self.tab.dispatchMessage("onTabUpdated", {});
+    onTabUpdated = true;
     try {
       var nodeTypes = {
         "frame": "sub_frame",
@@ -100,18 +103,15 @@ else if (typeof chrome !== 'undefined') { /* Chrome */
 }
 /**** wrapper (end) ****/
 
-var topLevelUrl = '';
-
-var uniquePageId = Date.now();
-background.receive("storageData", init);
-background.send("storageData", {pageId: uniquePageId});
-
 function init(data) {
-  if (data.pageId && data.pageId !== uniquePageId) return;
-
-  function isAllowedPage(top, list) {
-    for (var i = 0; i < list.length; i++) {
-      if (top && top.indexOf(list[i]) !== -1) return false;
+  var topLevelUrl = '';
+  function isAllowedPage(top, whitelist) {
+    if (top) {
+      try {
+        top = new URL(top).hostname;
+        if (whitelist.indexOf(top) !== -1) return false;
+      }
+      catch (e) {}
     }
     return true;
   }
@@ -124,8 +124,8 @@ function init(data) {
     if (style_c) head.removeChild(style_c);
   }
   if (data.startStop === "Enable") {
-    var list = JSON.parse(data.allowedURLs);
-    if (isAllowedPage(topLevelUrl, list)) {
+    var whitelist = JSON.parse(data.allowedURLs).join('|');
+    if (isAllowedPage(topLevelUrl, whitelist)) {
       if (head) {
         /* adding Lite css */
         var link = document.createElement("link");
@@ -157,3 +157,4 @@ function init(data) {
     }
   }
 }
+background.receive("storageData", init);

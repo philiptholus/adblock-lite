@@ -196,10 +196,14 @@ function addInputFieldItem(e) {
   var type = $('website-list-table').getAttribute("type");
   if (value) {
     if (type == "add") {
-      allowedURLs = allowedURLs.filter(function (e) {return e != value;});
-      allowedURLs.push(value);
-      storePopupData();
-      init();
+      try {
+        value = new URL(value).hostname;
+        allowedURLs = allowedURLs.filter(function (e) {return e != value;});
+        allowedURLs.push(value);
+        storePopupData();
+        init();
+      }
+      catch (e) {}
     }
     if (type == "toggle") {
       customRule = customRule.filter(function (e) {return e != value;});

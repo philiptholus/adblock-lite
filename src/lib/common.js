@@ -52,10 +52,9 @@ if (!storage.read("startStop"))   storage.write("startStop", "Enable");
 if (!storage.read("highlight"))   storage.write("highlight", "block");
 if (!storage.read("rid"))         storage.write("rid", Math.random().toString(36).substring(2, 14));
 
-function pageSend(e) {
+function pageSend() {
   content_script.send("storageData", {
     top: '',
-    pageId: e ? e.pageId : '',
     fullLite: storage.read("fullLite"),
     startStop: storage.read("startStop"),
     highlight: storage.read("highlight"),
@@ -63,8 +62,6 @@ function pageSend(e) {
     allowedURLs: storage.read("allowedURLs")
   }, true);
 }
-
-content_script.receive("storageData", pageSend, true);
 
 function setIcon() {
   var startStop = storage.read("startStop");
@@ -241,7 +238,7 @@ webRequestFilter.initialize().then(function () {
     if (topLevelUrls[current.tabId] !== top.url || current.url === top.url) {
       topLevelUrls[current.tabId] = top.url;
       var whitelist = JSON.parse(storage.read("allowedURLs"));
-      var index = whitelist.indexOf(top.host);
+      var index = whitelist.join('|').indexOf(top.host);
       doNotProceed[current.tabId] = (index === -1 ? false : true);
     }
     if (doNotProceed[current.tabId]) return false;
